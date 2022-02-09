@@ -15,12 +15,12 @@ class Credentials
 ```
 
 2. Jalankan command "dotnet restore"
-3. Jalankan command "dotnet ef database update"
+3. Jalankan command "dotnet ef database update"  
    jika belum ada "ef" tool, maka jalankan command "dotnet tool install dotnet-ef"
 4. Jalankan command "dotnet run"
 
 ## Cara migrasi database
 
-1. Jalankan command "dotnet ef migrations <nama_migrasi>"
+1. Jalankan command "dotnet ef migrations <nama_migrasi>"  
    jika belum ada "ef" tool, maka jalankan command "dotnet tool install dotnet-ef"
 2. Jalankan command "dotnet ef database update" untuk mengupdate database
