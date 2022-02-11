@@ -1,4 +1,4 @@
-namespace if3250_2022_01_buletin_backend.Models
+namespace if3250_2022_01_buletin_backend.src.Models
 {
     public class Product
     {
