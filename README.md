@@ -2,8 +2,7 @@
 
 ## Langkah - Langkah Menjalankan Server
 
-1. Buat File "Credentials.cs" di directory _src/_
-2. Ganti database username dan password
+1. Buat File "Credentials.cs" dan class di directory **src/**
 
 ```
 class Credentials
@@ -14,25 +13,26 @@ class Credentials
 }
 ```
 
-2. Mengupdate project (download package)
+2. Ganti database username dan password (ganti <BD_USERNAME> dan <DB_PASSWORD>)
+3. Mengupdate project (download package, jika menggunakan visual studio harusnya otomatis)
 
 ```
 dotnet restore
 ```
 
-3. _Jika belum ada_ "ef" tool (untuk migrasi)
+4. **Jika belum ada** "ef" tool (untuk migrasi)
 
 ```
 dotnet tool install dotnet-ef
 ```
 
-4. Mengupdate database (pastikan postgresql sudah jalan)
+5. Mengupdate database (pastikan postgresql sudah jalan)
 
 ```
 dotnet ef database update
 ```
 
-4. Menjalankan server
+6. Menjalankan server
 
 ```
 dotnet run
@@ -43,7 +43,7 @@ dotnet run
 1. Membuat atau menambahkan migrasi (ganti <nama_migrasi>)
 
 ```
-dotnet ef migrations <nama_migrasi> -o src/Migrations
+dotnet ef migrations add <nama_migrasi> -o src/Migrations
 ```
 
 2. Mengupdate database
