@@ -10,6 +10,7 @@ namespace if3250_2022_01_buletin_backend.src.Data
         }
 
         public DbSet<Product> Products { get; set; } = null!;
+        public DbSet<User> User { get; set; } = null!;
     }
 
 }
