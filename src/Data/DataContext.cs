@@ -1,6 +1,6 @@
-using if3250_2022_01_buletin_backend.src.Models;
+using src.Models;
 
-namespace if3250_2022_01_buletin_backend.src.Data
+namespace src.Data
 {
     public class DataContext : DbContext
     {

@@ -1,8 +1,8 @@
-﻿using if3250_2022_01_buletin_backend.src.Data;
-using if3250_2022_01_buletin_backend.src.Models;
+﻿using src.Data;
+using src.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace if3250_2022_01_buletin_backend.Controllers
+namespace src.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

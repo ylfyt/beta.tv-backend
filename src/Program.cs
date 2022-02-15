@@ -1,5 +1,5 @@
 global using Microsoft.EntityFrameworkCore;
-using if3250_2022_01_buletin_backend.src.Data;
+using src.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
