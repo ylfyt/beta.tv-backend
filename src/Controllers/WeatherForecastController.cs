@@ -1,7 +1,7 @@
 using src.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace if3250_2022_01_buletin_backend.src.Controllers
+namespace src.Controllers
 {
     [ApiController]
     [Route("[controller]")]
