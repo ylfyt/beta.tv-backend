@@ -1,5 +1,6 @@
 global using Microsoft.EntityFrameworkCore;
 using src.Data;
+using src.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,8 @@ builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseNpgsql(Constants.connectionString);
 });
+
+builder.Services.AddScoped<ITokenManager, TokenManager>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
