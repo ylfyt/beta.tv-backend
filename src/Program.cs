@@ -10,7 +10,10 @@ builder.Services.AddDbContext<DataContext>(options =>
     options.UseNpgsql(Constants.connectionString);
 });
 
+// TODO: Pilih yang terbaik
 builder.Services.AddScoped<ITokenManager, TokenManager>();
+// builder.Services.AddTransient<ITokenManager, TokenManager>();
+// builder.Services.AddSingleton<ITokenManager, TokenManager>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
