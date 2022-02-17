@@ -4,7 +4,7 @@ using System.Security.Claims;
 using src.Models;
 using src.Data;
 
-namespace src.Utils
+namespace src.Interfaces
 {
     public class TokenManager : ITokenManager
     {

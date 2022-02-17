@@ -1,6 +1,6 @@
 global using Microsoft.EntityFrameworkCore;
 using src.Data;
-using src.Utils;
+using src.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 

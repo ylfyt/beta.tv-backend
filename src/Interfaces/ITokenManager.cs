@@ -1,6 +1,6 @@
 using src.Models;
 
-namespace src.Utils
+namespace src.Interfaces
 {
     public interface ITokenManager
     {

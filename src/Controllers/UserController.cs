@@ -2,7 +2,8 @@ using src.Data;
 using src.Models;
 using src.Dtos;
 using Microsoft.AspNetCore.Mvc;
-using src.Utils;
+using src.Interfaces;
+using src.Filters;
 
 namespace src.Controllers
 {
@@ -19,17 +20,12 @@ namespace src.Controllers
         }
 
         [HttpGet("me")]
-        public async Task<ActionResult<User>?> me()
+        [AuthorizationCheckFilter]
+        public ActionResult<User> me()
         {
-            User user = new User
-            {
-                Id = 1,
-                Name = "Yudi",
-                Username = "yudi",
-                Email = "yudi@gmail.com",
-                Password = "1234"
-            };
-
+            var user = HttpContext.Items["user"] as User;
+            if (user == null)
+                return BadRequest();
             return user;
         }
 
@@ -45,29 +41,9 @@ namespace src.Controllers
             if (users[0].Password != input.Password)
                 return BadRequest();
 
-            var logs = await _context.TokenLogs.Where(x => x.UserId == users[0].Id).ToListAsync();
-            TokenLog log;
+            string token = await _tm.CreateToken(users[0]);
 
-            if (logs.Count != 1)
-            {
-                string token = _tm.CreateToken(users[0]);
-                log = new TokenLog
-                {
-                    UserId = users[0].Id,
-                    Token = token,
-                    Status = true,
-                };
-                await _context.TokenLogs.AddAsync(log);
-            }
-            else
-            {
-                log = logs[0];
-                if (!log.Status)
-                    log.Status = true;
-            }
-            await _context.SaveChangesAsync();
-
-            Response.Headers.Add("Authentication", log.Token);
+            Response.Headers.Add("Authorization", token);
 
             return users[0];
         }

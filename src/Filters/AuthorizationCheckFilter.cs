@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using src.Utils;
+using src.Interfaces;
 
 namespace src.Filters
 {
