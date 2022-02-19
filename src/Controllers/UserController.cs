@@ -38,7 +38,7 @@ namespace src.Controllers
                 return BadRequest();
 
             // TODO: Verify HashedPassword
-            if (users[0].Password != input.Password)
+            if (!VerifyPassword(input.Password, users[0]))
                 return BadRequest();
 
             string token = await _tm.CreateToken(users[0]);
@@ -46,6 +46,13 @@ namespace src.Controllers
             Response.Headers.Add("Authorization", token);
 
             return users[0];
+        }
+
+        private bool VerifyPassword(string password, User user)
+        {
+
+
+            return true;
         }
     }
 }
