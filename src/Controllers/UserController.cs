@@ -5,6 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 using src.Interfaces;
 using src.Filters;
 
+using System;
+using System.Security.Cryptography;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+
 namespace src.Controllers
 {
     [Route("api/[controller]")]
@@ -37,7 +41,6 @@ namespace src.Controllers
             if (users.Count != 1)
                 return BadRequest();
 
-            // TODO: Verify HashedPassword
             if (!VerifyPassword(input.Password, users[0]))
                 return BadRequest();
 
@@ -50,9 +53,15 @@ namespace src.Controllers
 
         private bool VerifyPassword(string password, User user)
         {
+            // derive a 256-bit subkey (use HMACSHA256 with 100,000 iterations)
+            string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: password,
+                salt: Convert.FromBase64String(user.PasswordSalt),
+                prf: KeyDerivationPrf.HMACSHA256,
+                iterationCount: 100000,
+                numBytesRequested: 256 / 8));
 
-
-            return true;
+            return hashed == user.Password;
         }
     }
 }
