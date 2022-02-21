@@ -23,7 +23,7 @@ dotnet restore
 4. **Jika belum ada** "ef" tool (untuk migrasi)
 
 ```
-dotnet tool install dotnet-ef
+dotnet tool install --global dotnet-ef
 ```
 
 5. Mengupdate database (pastikan postgresql sudah jalan)

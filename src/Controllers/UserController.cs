@@ -63,5 +63,21 @@ namespace src.Controllers
 
             return hashed == user.Password;
         }
+
+        [HttpPost("logout")]
+        [AuthorizationCheckFilter]
+        public async Task<ActionResult<bool>> logout()
+        {
+            var user = HttpContext.Items["user"] as User;
+            var logs = await _context.TokenLogs.Where(x => x.UserId == user!.Id).ToListAsync();
+            if(logs.Count != 1) {
+                return false;
+            }
+            Console.WriteLine("sampe sini");
+
+            logs[0].Status = false;
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }
