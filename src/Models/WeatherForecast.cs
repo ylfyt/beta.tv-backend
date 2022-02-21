@@ -1,4 +1,4 @@
-namespace if3250_2022_01_buletin_backend.src.Models
+namespace src.Models
 {
     public class WeatherForecast
     {

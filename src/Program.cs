@@ -1,5 +1,6 @@
 global using Microsoft.EntityFrameworkCore;
-using if3250_2022_01_buletin_backend.src.Data;
+using src.Data;
+using src.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,11 @@ builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseNpgsql(Constants.connectionString);
 });
+
+// TODO: Pilih yang terbaik
+builder.Services.AddScoped<ITokenManager, TokenManager>();
+// builder.Services.AddTransient<ITokenManager, TokenManager>();
+// builder.Services.AddSingleton<ITokenManager, TokenManager>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
