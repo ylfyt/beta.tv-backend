@@ -73,11 +73,55 @@ namespace src.Controllers
             if(logs.Count != 1) {
                 return false;
             }
-            Console.WriteLine("sampe sini");
 
             logs[0].Status = false;
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        [HttpPost("register")]
+        public async Task<ActionResult<User>> register([FromBody] RegisterDto input)
+        {
+            if(input.Username.Length < 3 || input.Password.Length < 3 || input.Email == "" || input.Name == "") 
+                return BadRequest();
+
+            var users = await _context.User.Where(x => x.Username == input.Username).ToListAsync();
+
+            if (users.Count != 0)
+                return BadRequest();
+
+            string password = input.Password;
+
+            // generate a 128-bit salt using a cryptographically strong random sequence of nonzero values
+            byte[] salt = new byte[128 / 8];
+            using (var rngCsp = new RNGCryptoServiceProvider())
+            {
+                rngCsp.GetNonZeroBytes(salt);
+            }
+
+            // derive a 256-bit subkey (use HMACSHA256 with 100,000 iterations)
+            string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: password,
+                salt: salt,
+                prf: KeyDerivationPrf.HMACSHA256,
+                iterationCount: 100000,
+                numBytesRequested: 256 / 8));
+
+            var insert = new User { 
+                Name = input.Name,
+                Username = input.Username,
+                Email = input.Email,
+                PasswordSalt = Convert.ToBase64String(salt),
+                Password = hashed
+            };
+
+            await _context.User.AddAsync(insert);
+            await _context.SaveChangesAsync();
+
+            string token = await _tm.CreateToken(insert);
+
+            Response.Headers.Add("Authorization", token);
+            return insert;
         }
     }
 }
