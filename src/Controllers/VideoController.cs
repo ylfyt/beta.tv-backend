@@ -13,7 +13,7 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
     public class VideoController : Controller
     {
         public readonly DataContext _context;
-        
+
         public VideoController(DataContext context)
         {
             _context = context;
@@ -27,7 +27,7 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Video>> GetVideo(int id)
+        public async Task<ActionResult<Video>> GetVideoById(int id)
         {
             var idVideos = await _context.Videos.Where(v => v.Id == id).ToListAsync();
             if (idVideos.Count != 1)
@@ -37,8 +37,8 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
             return Ok(idVideos[0]);
         }
 
-        [HttpGet("{category}")]
-        public async Task<ActionResult<List<Video>>> GetVideo(string category)
+        [HttpGet("category/{category}")]
+        public async Task<ActionResult<List<Video>>> GetVideoByCategory(string category)
         {
             var catVideos = await _context.Videos.Where(v => v.Category == category).ToListAsync();
             if (catVideos.Count == 0)
@@ -94,6 +94,7 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
                 return BadRequest("There is no such video");
             }
             _context.Videos.Remove(deletedVideo[0]);
+            await _context.SaveChangesAsync();
             return Ok(deletedVideo[0]);
         }
 
