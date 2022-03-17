@@ -38,8 +38,7 @@ or
 class Credentials
 {
     // DB Config
-    public const string DB_USERNAME = "<DB_USERNAME>";
-    public const string DB_PASSWORD = "<DB_PASSWORD>";
+    
 }
 ```
 
