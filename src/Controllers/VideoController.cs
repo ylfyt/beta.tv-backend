@@ -16,14 +16,14 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
         private static List<Video> videos = new List<Video> { };
 
         [HttpGet]
-        public async Task<ActionResult<List<Product>>> GetVideo() 
-        { 
-            return Ok(videos);                
+        public async Task<ActionResult<List<Product>>> GetVideo()
+        {
+            return Ok(videos);
         }
-        
+
         [HttpGet("{category}")]
-        public async Task<ActionResult<List<Video>>> GetVideo(string category) 
-        { 
+        public async Task<ActionResult<List<Video>>> GetVideo(string category)
+        {
             var catVideos = videos.Find(v => v.Category == category);
             if (catVideos == null)
             {
@@ -31,7 +31,7 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
             }
             return Ok(catVideos);
         }
-        
+
         [HttpPost]
         public async Task<ActionResult<List<Video>>> UploadVideo(Video vid)
         {
@@ -40,18 +40,18 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<List<Video>>> UpdateVideo(int id, string name, string category, string channel, string url)
+        public async Task<ActionResult<List<Video>>> UpdateVideo(int id, string title, string category, int channelId, string url)
         {
             var selectedVideo = videos.Find(v => v.Id == id);
             if (selectedVideo == null)
             {
                 return BadRequest("Index out of bounds");
             }
-            selectedVideo.Name = name;
+            selectedVideo.Title = title;
             selectedVideo.Category = category;
-            selectedVideo.Channel = channel;
+            selectedVideo.ChannelId = channelId;
             selectedVideo.Url = url;
-            
+
             return Ok(videos);
         }
 
@@ -66,6 +66,6 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
             videos.Remove(deletedVideo);
             return Ok(videos);
         }
-        
+
     }
 }
