@@ -1,0 +1,1 @@
+docker-compose up -d --no-deps --build if3250_2022_01_buletin_backend

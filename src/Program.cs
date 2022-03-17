@@ -4,10 +4,24 @@ using src.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
+Console.WriteLine("===============================");
+var connectionString = Environment.GetEnvironmentVariable("connection-string");
+if (connectionString == null)
+{
+    Console.WriteLine("Connection string in environment is not found. Get from constant");
+    connectionString = Constants.connectionString;
+}
+else
+{
+    Console.WriteLine("Get onnection string from environment");
+}
+Console.WriteLine(connectionString);
+Console.WriteLine("===============================");
+
 // Add services to the container.
 builder.Services.AddDbContext<DataContext>(options =>
 {
-    options.UseNpgsql(Constants.connectionString);
+    options.UseNpgsql(connectionString);
 });
 
 // TODO: Pilih yang terbaik
@@ -32,5 +46,16 @@ if (app.Environment.IsDevelopment())
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    var context = services.GetRequiredService<DataContext>();
+    if (context.Database.GetPendingMigrations().Any())
+    {
+        context.Database.Migrate();
+    }
+}
 
 app.Run();
