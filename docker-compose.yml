@@ -9,6 +9,8 @@ services:
             dockerfile: Dockerfile
         ports:
             - '8080:80'
+        environment:
+            - connection-string=Host=database;Username=postgres;Password=postgres;Database=buletin.id;
     database:
         image: postgres:latest
         environment:
