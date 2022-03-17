@@ -1,5 +1,35 @@
 # IF3250_2022_01_BULETIN_Backend
 
+## Cara Menggunakan Docker
+
+1. Jika pertama kali menjalankan server dengan docker, jalan script
+
+```
+./update-server-containers.bat
+```
+
+or
+
+```
+./start-server-containers.bat
+```
+
+2. Jika sudah mengedit src program, untuk mengupdate container jalankan script
+
+```
+./update-server-containers.bat
+```
+
+3. Untuk stop atau start containers, jalankan script
+
+```
+./stop-server-containers.bat
+```
+
+```
+./start-server-containers.bat
+```
+
 ## Langkah - Langkah Menjalankan Server
 
 1. Buat File "Credentials.cs" dan class di directory **src/**
