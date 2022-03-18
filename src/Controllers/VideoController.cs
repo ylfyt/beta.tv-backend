@@ -20,52 +20,100 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Video>>> GetVideo()
+        public async Task<ActionResult<ResponseDto<DataVideosResponseDto>>> GetVideo()
         {
             List<Video> videos = await _context.Videos.ToListAsync();
-            return Ok(videos);
+            var response = new ResponseDto<DataVideosResponseDto>
+            {
+                success = true,
+                data = new DataVideosResponseDto
+                {
+                    videos = videos
+                }
+            };
+            return Ok(response);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Video>> GetVideoById(int id)
+        public async Task<ActionResult<ResponseDto<DataVideoResponseDto>>> GetVideoById(int id)
         {
+            var response = new ResponseDto<DataVideoResponseDto>
+            {
+                success = false,
+                data = new DataVideoResponseDto
+                {
+                    video = null
+                }
+            };
             var idVideos = await _context.Videos.Where(v => v.Id == id).ToListAsync();
             if (idVideos.Count != 1)
             {
-                return BadRequest("Video not found");
+                response.message = "Video not found";
+                return NotFound(response);
             }
-            return Ok(idVideos[0]);
+            response.data.video = idVideos[0];
+            response.success = true;
+            return Ok(response);
         }
 
         [HttpGet("category/{category}")]
-        public async Task<ActionResult<List<Video>>> GetVideoByCategory(string category)
+        public async Task<ActionResult<ResponseDto<DataVideosResponseDto>>> GetVideoByCategory(string category)
         {
+            var response = new ResponseDto<DataVideosResponseDto>
+            {
+                success = false,
+                data = new DataVideosResponseDto()
+            };
             var catVideos = await _context.Videos.Where(v => v.Category == category).ToListAsync();
             if (catVideos.Count == 0)
             {
-                return BadRequest("There is no such category");
+                response.message = "Videos not found";
+                return BadRequest(response);
             }
-            return Ok(catVideos);
+            response.data.videos = catVideos;
+            response.success = true;
+            return Ok(response);
         }
 
         [HttpPost]
-        public async Task<ActionResult<Video>> UploadVideo([FromBody] VideoAddDto input)
+        public async Task<ActionResult<ResponseDto<DataVideoResponseDto>>> UploadVideo([FromBody] VideoAddDto input)
         {
-            var insert = new Video
+
+            var response = new ResponseDto<DataVideoResponseDto>
             {
-                Title = input.Title,
-                ChannelId = input.ChannelId,
-                Url = input.Url,
-                Views = input.Views,
-                Rating = input.Rating,
-                Category = input.Category,
-                Description = input.Description,
-                Release_Date = new DateTime()
+                success = false,
+                data = new DataVideoResponseDto
+                {
+                    video = null
+                }
             };
 
-            await _context.Videos.AddAsync(insert);
-            await _context.SaveChangesAsync();
-            return Ok(insert);
+            try
+            {
+                var insert = new Video
+                {
+                    Title = input.Title,
+                    ChannelId = input.ChannelId,
+                    Url = input.Url,
+                    Views = input.Views,
+                    Rating = input.Rating,
+                    Category = input.Category,
+                    Description = input.Description,
+                    Release_Date = new DateTime()
+                };
+
+                await _context.Videos.AddAsync(insert);
+                await _context.SaveChangesAsync();
+
+                response.success = true;
+                response.data.video = insert;
+                return Ok(response);
+            }
+            catch (System.Exception)
+            {
+                response.message = "Failed to add video";
+                return BadRequest(response);
+            }
         }
 
         [HttpPut("{id}")]
