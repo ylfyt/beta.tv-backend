@@ -8,6 +8,7 @@ using src.Filters;
 using System;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using src.Dtos.user;
 
 namespace src.Controllers
 {
@@ -25,30 +26,53 @@ namespace src.Controllers
 
         [HttpGet("me")]
         [AuthorizationCheckFilter]
-        public ActionResult<User> me()
+        public ActionResult<ResponseDto<DataUser>> me()
         {
+            var response = new ResponseDto<DataUser>
+            {
+                success = false,
+                data = new DataUser()
+            };
             var user = HttpContext.Items["user"] as User;
             if (user == null)
-                return BadRequest();
-            return user;
+            {
+                response.message = "User Not Found";
+                return NotFound(response);
+            }
+            response.success = true;
+            response.data.user = user;
+            return response;
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<User>> login([FromBody] LoginInputDto input)
+        public async Task<ActionResult<ResponseDto<DataUser>>> login([FromBody] LoginInputDto input)
         {
+            var response = new ResponseDto<DataUser>
+            {
+                success = false,
+                data = new DataUser()
+            };
+
             var users = await _context.User.Where(x => x.Username == input.Username).ToListAsync();
 
             if (users.Count != 1)
-                return BadRequest();
+            {
+                response.message = "Bad request";
+                return BadRequest(response);
+            }
 
             if (!VerifyPassword(input.Password, users[0]))
-                return BadRequest();
+            {
+                response.message = "Bad request";
+                return BadRequest(response);
+            }
 
             string token = await _tm.CreateToken(users[0]);
 
             Response.Headers.Add("Authorization", token);
-
-            return users[0];
+            response.success = true;
+            response.data.user = users[0];
+            return response;
         }
 
         private bool VerifyPassword(string password, User user)
@@ -66,29 +90,48 @@ namespace src.Controllers
 
         [HttpPost("logout")]
         [AuthorizationCheckFilter]
-        public async Task<ActionResult<bool>> logout()
+        public async Task<ActionResult<ResponseDto<DataUser>>> logout()
         {
+            var response = new ResponseDto<DataUser>
+            {
+                success = false,
+                data = new DataUser()
+            };
             var user = HttpContext.Items["user"] as User;
             var logs = await _context.TokenLogs.Where(x => x.UserId == user!.Id).ToListAsync();
-            if(logs.Count != 1) {
-                return false;
+            if (logs.Count != 1)
+            {
+                response.message = "Bad request";
+                return response;
             }
 
             logs[0].Status = false;
             await _context.SaveChangesAsync();
-            return true;
+            response.success = true;
+            return response;
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<User>> register([FromBody] RegisterDto input)
+        public async Task<ActionResult<ResponseDto<DataUser>>> register([FromBody] RegisterDto input)
         {
-            if(input.Username.Length < 3 || input.Password.Length < 3 || input.Email == "" || input.Name == "") 
-                return BadRequest();
+            var response = new ResponseDto<DataUser>
+            {
+                success = false,
+                data = new DataUser()
+            };
+            if (input.Username.Length < 3 || input.Password.Length < 3 || input.Email == "" || input.Name == "")
+            {
+                response.message = "Bad Request";
+                return BadRequest(response);
+            }
 
             var users = await _context.User.Where(x => x.Username == input.Username).ToListAsync();
 
             if (users.Count != 0)
-                return BadRequest();
+            {
+                response.message = "Bad Request";
+                return BadRequest(response);
+            }
 
             string password = input.Password;
 
@@ -107,7 +150,8 @@ namespace src.Controllers
                 iterationCount: 100000,
                 numBytesRequested: 256 / 8));
 
-            var insert = new User { 
+            var insert = new User
+            {
                 Name = input.Name,
                 Username = input.Username,
                 Email = input.Email,
@@ -121,7 +165,10 @@ namespace src.Controllers
             string token = await _tm.CreateToken(insert);
 
             Response.Headers.Add("Authorization", token);
-            return insert;
+
+            response.success = true;
+            response.data.user = insert;
+            return Ok(response);
         }
     }
 }
