@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using src.Interfaces;
+using src.Dtos;
 
 namespace src.Filters
 {
@@ -12,8 +13,14 @@ namespace src.Filters
 
             if (!context.HttpContext.Request.Headers.ContainsKey("Authorization"))
             {
-                context.ModelState.AddModelError("Unauthorized", "Not Authorized");
-                context.Result = new UnauthorizedObjectResult(context.ModelState);
+                context.HttpContext.Response.StatusCode = 401;
+                object? data = null;
+                context.Result = new JsonResult(new
+                {
+                    success = false,
+                    message = "Unauthorized",
+                    data
+                });
             }
             else
             {
@@ -25,10 +32,16 @@ namespace src.Filters
                     var user = _tm?.VerifyToken(token);
                     context.HttpContext.Items["user"] = user;
                 }
-                catch (System.Exception e)
+                catch (System.Exception)
                 {
-                    context.ModelState.AddModelError("Unauthorized", e.Message);
-                    context.Result = new UnauthorizedObjectResult(context.ModelState);
+                    context.HttpContext.Response.StatusCode = 401;
+                    object? data = null;
+                    context.Result = new JsonResult(new
+                    {
+                        success = false,
+                        message = "Unauthorized",
+                        data
+                    });
                 }
             }
         }

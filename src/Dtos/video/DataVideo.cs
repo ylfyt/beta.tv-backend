@@ -4,6 +4,6 @@ namespace src.Dtos.video
 {
     public class DataVideo
     {
-        public Video? video { get; set; } = null;
+        public Video video { get; set; } = null!;
     }
 }

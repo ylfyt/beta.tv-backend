@@ -26,9 +26,10 @@ namespace src.Controllers
 
         [HttpGet("me")]
         [AuthorizationCheckFilter]
-        public ActionResult<ResponseDto<DataUser>> me()
+        public async Task<ActionResult<ResponseDto<DataUser>>> me()
         {
-            var user = HttpContext.Items["user"] as User;
+            var userAuth = HttpContext.Items["user"] as User;
+            var user = await _context.User.FindAsync(userAuth!.Id);
             if (user == null)
             {
                 return NotFound(new ResponseDto
