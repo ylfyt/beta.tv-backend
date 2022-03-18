@@ -117,33 +117,62 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Video>> UpdateVideo(int id, [FromBody] VideoUpdateDto input)
+        public async Task<ActionResult<ResponseDto<DataVideoResponseDto>>> UpdateVideo(int id, [FromBody] VideoUpdateDto input)
         {
-            var selectedVideo = await _context.Videos.Where(v => v.Id == id).ToListAsync();
-            if (selectedVideo.Count != 1)
+            var response = new ResponseDto<DataVideoResponseDto>
             {
-                return BadRequest("Error fetching video");
-            }
-            selectedVideo[0].Title = input.Title;
-            selectedVideo[0].Category = input.Category;
-            selectedVideo[0].Description = input.Description;
-            selectedVideo[0].Url = input.Url;
-            await _context.SaveChangesAsync();
+                success = false,
+                data = new DataVideoResponseDto
+                {
+                    video = null
+                }
+            };
+            try
+            {
+                var selectedVideo = await _context.Videos.Where(v => v.Id == id).ToListAsync();
+                if (selectedVideo.Count != 1)
+                {
+                    response.message = "Video Not Found";
+                    return NotFound(response);
+                }
+                selectedVideo[0].Title = input.Title;
+                selectedVideo[0].Category = input.Category;
+                selectedVideo[0].Description = input.Description;
+                selectedVideo[0].Url = input.Url;
+                await _context.SaveChangesAsync();
 
-            return Ok(selectedVideo[0]);
+                response.data.video = selectedVideo[0];
+                return Ok(response);
+            }
+            catch (System.Exception)
+            {
+                response.message = "Failed to add video";
+                return BadRequest(response);
+            }
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<List<Video>>> DeleteVideo(int id)
+        public async Task<ActionResult<ResponseDto<DataVideoResponseDto>>> DeleteVideo(int id)
         {
+            var response = new ResponseDto<DataVideoResponseDto>
+            {
+                success = false,
+                data = new DataVideoResponseDto
+                {
+                    video = null
+                }
+            };
+
             var deletedVideo = await _context.Videos.Where(v => v.Id == id).ToListAsync();
             if (deletedVideo.Count != 1)
             {
-                return BadRequest("There is no such video");
+                response.message = "Video Not Found";
+                return NotFound(response);
             }
             _context.Videos.Remove(deletedVideo[0]);
             await _context.SaveChangesAsync();
-            return Ok(deletedVideo[0]);
+            response.data.video = deletedVideo[0];
+            return Ok(response);
         }
 
     }
