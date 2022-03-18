@@ -20,13 +20,13 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<ResponseDto<DataVideosResponseDto>>> GetVideo()
+        public async Task<ActionResult<ResponseDto<DataVideos>>> GetVideo()
         {
             List<Video> videos = await _context.Videos.ToListAsync();
-            var response = new ResponseDto<DataVideosResponseDto>
+            var response = new ResponseDto<DataVideos>
             {
                 success = true,
-                data = new DataVideosResponseDto
+                data = new DataVideos
                 {
                     videos = videos
                 }
@@ -35,12 +35,12 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ResponseDto<DataVideoResponseDto>>> GetVideoById(int id)
+        public async Task<ActionResult<ResponseDto<DataVideo>>> GetVideoById(int id)
         {
-            var response = new ResponseDto<DataVideoResponseDto>
+            var response = new ResponseDto<DataVideo>
             {
                 success = false,
-                data = new DataVideoResponseDto
+                data = new DataVideo
                 {
                     video = null
                 }
@@ -57,12 +57,12 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
         }
 
         [HttpGet("category/{category}")]
-        public async Task<ActionResult<ResponseDto<DataVideosResponseDto>>> GetVideoByCategory(string category)
+        public async Task<ActionResult<ResponseDto<DataVideos>>> GetVideoByCategory(string category)
         {
-            var response = new ResponseDto<DataVideosResponseDto>
+            var response = new ResponseDto<DataVideos>
             {
                 success = false,
-                data = new DataVideosResponseDto()
+                data = new DataVideos()
             };
             var catVideos = await _context.Videos.Where(v => v.Category == category).ToListAsync();
             if (catVideos.Count == 0)
@@ -76,13 +76,13 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ResponseDto<DataVideoResponseDto>>> UploadVideo([FromBody] VideoAddDto input)
+        public async Task<ActionResult<ResponseDto<DataVideo>>> UploadVideo([FromBody] VideoAddDto input)
         {
 
-            var response = new ResponseDto<DataVideoResponseDto>
+            var response = new ResponseDto<DataVideo>
             {
                 success = false,
-                data = new DataVideoResponseDto
+                data = new DataVideo
                 {
                     video = null
                 }
@@ -117,12 +117,12 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<ResponseDto<DataVideoResponseDto>>> UpdateVideo(int id, [FromBody] VideoUpdateDto input)
+        public async Task<ActionResult<ResponseDto<DataVideo>>> UpdateVideo(int id, [FromBody] VideoUpdateDto input)
         {
-            var response = new ResponseDto<DataVideoResponseDto>
+            var response = new ResponseDto<DataVideo>
             {
                 success = false,
-                data = new DataVideoResponseDto
+                data = new DataVideo
                 {
                     video = null
                 }
@@ -152,12 +152,12 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ResponseDto<DataVideoResponseDto>>> DeleteVideo(int id)
+        public async Task<ActionResult<ResponseDto<DataVideo>>> DeleteVideo(int id)
         {
-            var response = new ResponseDto<DataVideoResponseDto>
+            var response = new ResponseDto<DataVideo>
             {
                 success = false,
-                data = new DataVideoResponseDto
+                data = new DataVideo
                 {
                     video = null
                 }
