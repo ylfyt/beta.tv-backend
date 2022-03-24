@@ -23,7 +23,7 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
         public async Task<ActionResult<ResponseDto<DataVideos>>> GetVideo()
         {
             List<Video> videos = await _context.Videos.ToListAsync();
-            var response = new ResponseDto
+            var response = new ResponseDto<DataVideos>
             {
                 success = true,
                 data = new DataVideos
@@ -40,13 +40,13 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
             var idVideos = await _context.Videos.Where(v => v.Id == id).ToListAsync();
             if (idVideos.Count != 1)
             {
-                return NotFound(new ResponseDto
+                return NotFound(new ResponseDto<DataVideo>
                 {
                     message = "Video not found"
                 });
             }
 
-            return Ok(new ResponseDto
+            return Ok(new ResponseDto<DataVideo>
             {
                 success = true,
                 data = new DataVideo
@@ -62,14 +62,14 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
             var catVideos = await _context.Videos.Where(v => v.Category == category).ToListAsync();
             if (catVideos.Count == 0)
             {
-                return NotFound(new ResponseDto
+                return NotFound(new ResponseDto<DataVideos>
                 {
                     message = "Video not found",
                     data = new DataVideos()
                 });
             }
 
-            return Ok(new ResponseDto
+            return Ok(new ResponseDto<DataVideos>
             {
                 success = true,
                 data = new DataVideos
@@ -99,7 +99,7 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
                 await _context.Videos.AddAsync(insert);
                 await _context.SaveChangesAsync();
 
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<DataVideo>
                 {
                     success = true,
                     data = new DataVideo
@@ -110,7 +110,7 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
             }
             catch (System.Exception)
             {
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<DataVideo>
                 {
                     message = "Failed to add video"
                 });
@@ -125,7 +125,7 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
                 var selectedVideo = await _context.Videos.Where(v => v.Id == id).ToListAsync();
                 if (selectedVideo.Count != 1)
                 {
-                    return NotFound(new ResponseDto
+                    return NotFound(new ResponseDto<DataVideo>
                     {
                         message = "Video not found",
                     });
@@ -136,7 +136,7 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
                 selectedVideo[0].Url = input.Url;
                 await _context.SaveChangesAsync();
 
-                return Ok(new ResponseDto
+                return Ok(new ResponseDto<DataVideo>
                 {
                     success = true,
                     data = new DataVideo
@@ -147,7 +147,7 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
             }
             catch (System.Exception)
             {
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<DataVideo>
                 {
                     message = "Failed to edit video"
                 });
@@ -160,7 +160,7 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
             var deletedVideo = await _context.Videos.Where(v => v.Id == id).ToListAsync();
             if (deletedVideo.Count != 1)
             {
-                return NotFound(new ResponseDto
+                return NotFound(new ResponseDto<DataVideo>
                 {
                     message = "Video not found"
                 });
@@ -168,7 +168,7 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
             _context.Videos.Remove(deletedVideo[0]);
             await _context.SaveChangesAsync();
 
-            return Ok(new ResponseDto
+            return Ok(new ResponseDto<DataVideo>
             {
                 success = true,
                 data = new DataVideo

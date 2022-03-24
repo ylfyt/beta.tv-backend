@@ -7,5 +7,5 @@ namespace src.Dtos
         public T? data { get; set; }
     }
 
-    public class ResponseDto : ResponseDto<object> { }
+    // public class ResponseDto : ResponseDto<object> { }
 }

@@ -32,13 +32,13 @@ namespace src.Controllers
             var user = await _context.User.FindAsync(userAuth!.Id);
             if (user == null)
             {
-                return NotFound(new ResponseDto
+                return NotFound(new ResponseDto<DataUser>
                 {
                     message = "User Not Found"
                 });
             }
 
-            return Ok(new ResponseDto
+            return Ok(new ResponseDto<DataUser>
             {
                 success = true,
                 data = new DataUser
@@ -55,7 +55,7 @@ namespace src.Controllers
 
             if (users.Count != 1)
             {
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<DataUser>
                 {
                     message = "Bad request"
                 });
@@ -63,7 +63,7 @@ namespace src.Controllers
 
             if (!VerifyPassword(input.Password, users[0]))
             {
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<DataUser>
                 {
                     message = "Bad request"
                 });
@@ -73,7 +73,7 @@ namespace src.Controllers
 
             Response.Headers.Add("Authorization", token);
 
-            return Ok(new ResponseDto
+            return Ok(new ResponseDto<DataUser>
             {
                 success = true,
                 data = new DataUser
@@ -104,7 +104,7 @@ namespace src.Controllers
             var logs = await _context.TokenLogs.Where(x => x.UserId == user!.Id).ToListAsync();
             if (logs.Count != 1)
             {
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<DataUser>
                 {
                     message = "Bad request"
                 });
@@ -113,7 +113,7 @@ namespace src.Controllers
             logs[0].Status = false;
             await _context.SaveChangesAsync();
 
-            return Ok(new ResponseDto
+            return Ok(new ResponseDto<DataUser>
             {
                 success = true
             });
@@ -124,7 +124,7 @@ namespace src.Controllers
         {
             if (input.Username.Length < 3 || input.Password.Length < 3 || input.Email == "" || input.Name == "")
             {
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<DataUser>
                 {
                     message = "Bad request"
                 });
@@ -134,7 +134,7 @@ namespace src.Controllers
 
             if (users.Count != 0)
             {
-                return BadRequest(new ResponseDto
+                return BadRequest(new ResponseDto<DataUser>
                 {
                     message = "Bad request"
                 });
@@ -173,7 +173,7 @@ namespace src.Controllers
 
             Response.Headers.Add("Authorization", token);
 
-            return Ok(new ResponseDto
+            return Ok(new ResponseDto<DataUser>
             {
                 success = true,
                 data = new DataUser
