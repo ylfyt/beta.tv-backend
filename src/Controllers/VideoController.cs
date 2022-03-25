@@ -178,5 +178,34 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
             });
         }
 
+        [HttpPost("search")]
+        public async Task<ActionResult<ResponseDto<DataVideos>>> GetVideoByQuery([FromBody] SearchVideoDto input)
+        {
+            if (input.Query == "")
+            {
+                return BadRequest(new ResponseDto<DataVideos>
+                {
+                    message = "Please input query"
+                });
+            }
+
+            var arr = input.Query.ToLower().Split(' ');
+
+            List<Video> videos = new List<Video>();
+            foreach (var word in arr)
+            {
+                var newVideos = _context.Videos.AsEnumerable().Where(a => a.Title.ToLower().Contains(word)).Except(videos).ToList();
+                videos.AddRange(newVideos);
+            }
+
+            return Ok(new ResponseDto<DataVideos>
+            {
+                success = true,
+                data = new DataVideos
+                {
+                    videos = videos
+                }
+            });
+        }
     }
 }
