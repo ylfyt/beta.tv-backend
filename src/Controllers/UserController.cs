@@ -47,6 +47,21 @@ namespace src.Controllers
                 }
             });
         }
+        
+        [HttpGet]
+        public async Task<ActionResult<ResponseDto<DataUser>>> GetAllUser()
+        {
+            List<User> allUser = await _context.User.ToListAsync();
+            var response = new ResponseDto<DataUsers>
+            {
+                success = true,
+                data = new DataUsers
+                {
+                    users = allUser
+                }
+            };
+            return Ok(response);
+        }
 
         [HttpPost("login")]
         public async Task<ActionResult<ResponseDto<DataUser>>> login([FromBody] LoginInputDto input)
@@ -179,6 +194,30 @@ namespace src.Controllers
                 data = new DataUser
                 {
                     user = insert
+                }
+            });
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<ResponseDto<DataUser>>> DeleteUser(int id)
+        {
+            var deletedUser = await _context.User.Where(v => v.Id == id).ToListAsync();
+            if (deletedUser.Count != 1)
+            {
+                return NotFound(new ResponseDto<DataUser>
+                {
+                    message = "User doesn't exist"
+                });
+            }
+            _context.User.Remove(deletedUser[0]);
+            await _context.SaveChangesAsync();
+
+            return Ok(new ResponseDto<DataUser>
+            {
+                success = true,
+                data = new DataUser
+                {
+                    user = deletedUser[0]
                 }
             });
         }
