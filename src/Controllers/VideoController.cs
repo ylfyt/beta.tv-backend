@@ -109,7 +109,7 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
                 {
                     YoutubeVideoId = input.YoutubeVideoId,
                     Title = videoData.snippet != null ? videoData.snippet!.title : "",
-                    ThumbnailUrl = videoData.snippet!.thumbnails!.high!.url,
+                    ThumbnailUrl = videoData.snippet!.thumbnails!.medium!.url,
                     ChannelId = videoData.snippet.channelId,
                     ChannelName = videoData.snippet.channelTitle,
                     Url = "https://www.youtube.com/embed/" + input.YoutubeVideoId,

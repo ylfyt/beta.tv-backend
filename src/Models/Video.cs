@@ -14,7 +14,7 @@ namespace src.Models
         public string Url { get; set; } = string.Empty;
         public List<string> Categories { get; set; } = new List<string>();
         public string Description { get; set; } = string.Empty;
-        public string CreateAt { get; set; } = DateTime.Today.ToString();
+        public string CreateAt { get; set; } = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
         public string AuthorDescription { get; set; } = string.Empty;
         public string AuthorTitle { get; set; } = string.Empty;
         public int AuthorId { get; set; }
