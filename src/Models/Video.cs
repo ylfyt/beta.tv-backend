@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace src.Models
 {
     public class Video
@@ -10,9 +12,9 @@ namespace src.Models
         public string ChannelId { get; set; } = string.Empty;
         public string ChannelName { get; set; } = string.Empty;
         public string Url { get; set; } = string.Empty;
-        public List<string> Categories { get; set; } = new List<string>();
+        public List<string>? Categories { get; set; } = new List<string>();
         public string Description { get; set; } = string.Empty;
-        public DateTime CreateAt { get; set; }
+        public string CreateAt { get; set; } = DateTime.Today.ToString();
         public string AuthorDescription { get; set; } = string.Empty;
         public string AuthorTitle { get; set; } = string.Empty;
         public int AuthorId { get; set; }

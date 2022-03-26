@@ -104,14 +104,13 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
                 var insert = new Video
                 {
                     YoutubeVideoId = input.YoutubeVideoId,
-                    Title = videoData.items[0].snippet == null ? videoData.items[0].snippet!.title : "",
+                    Title = videoData.items[0].snippet != null ? videoData.items[0].snippet!.title : "",
                     ThumbnailUrl = videoData.items[0].snippet.thumbnails.high.url,
                     ChannelId = videoData.items[0].snippet.channelId,
                     ChannelName = videoData.items[0].snippet.channelTitle,
                     Url = "https://www.youtube.com/embed/" + input.YoutubeVideoId,
                     Description = videoData.items[0].snippet.description,
                     Categories = input.Categories,
-                    CreateAt = DateTime.Today,
                     AuthorDescription = input.AuthorDescription,
                     AuthorTitle = input.AuthorTitle,
                     AuthorName = userAuth!.Id.ToString(),
@@ -214,7 +213,7 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
             return "hello";
         }
 
-        public async Task<YoutubeApiResponseDto?> GetVideoUsingYoutubeAPI(string id)
+        private async Task<YoutubeApiResponseDto?> GetVideoUsingYoutubeAPI(string id)
         {
             string YOUTUBE_API_BASE_URL = "https://www.googleapis.com/youtube/v3";
             string YOUTUBE_API_VIDEOS_ENDPOINT = "videos";
