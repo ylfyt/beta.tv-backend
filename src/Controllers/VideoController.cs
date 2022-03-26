@@ -21,6 +21,7 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
         }
 
         [HttpGet]
+        [AuthorizationCheckFilter]
         public async Task<ActionResult<ResponseDto<DataVideos>>> GetVideo()
         {
             List<Video> videos = await _context.Videos.ToListAsync();
@@ -80,45 +81,64 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
         //     });
         // }
 
-        // [HttpPost]
-        // public async Task<ActionResult<ResponseDto<DataVideo>>> UploadVideo([FromBody] VideoAddDto input)
-        // {
-        //     try
-        //     {
-        //         var newVideo = await GetVideoUsingYoutubeAPI(input.YoutubeVideoId);
+        [HttpPost]
+        [AuthorizationCheckFilter]
+        public async Task<ActionResult<ResponseDto<DataVideo>>> UploadVideo([FromBody] VideoAddDto input)
+        {
+            try
+            {
+                var videoData = await GetVideoUsingYoutubeAPI(input.YoutubeVideoId);
 
-        //         var insert = new Video
-        //         {
-        //             Title = input.Title,
-        //             ChannelId = input.ChannelId,
-        //             Url = input.Url,
-        //             Views = input.Views,
-        //             Rating = input.Rating,
-        //             Category = input.Category,
-        //             Description = input.Description,
-        //             Release_Date = new DateTime()
-        //         };
+                if (videoData == null || videoData.pageInfo?.resultsPerPage == 0)
+                {
+                    return BadRequest(
+                        new ResponseDto<DataVideo>
+                        {
+                            message = "Failed to upload video"
+                        }
+                    );
+                }
 
-        //         await _context.Videos.AddAsync(insert);
-        //         await _context.SaveChangesAsync();
+                var userAuth = HttpContext.Items["user"] as User;
 
-        //         return Ok(new ResponseDto<DataVideo>
-        //         {
-        //             success = true,
-        //             data = new DataVideo
-        //             {
-        //                 video = insert
-        //             }
-        //         });
-        //     }
-        //     catch (System.Exception)
-        //     {
-        //         return BadRequest(new ResponseDto<DataVideo>
-        //         {
-        //             message = "Failed to add video"
-        //         });
-        //     }
-        // }
+                var insert = new Video
+                {
+                    YoutubeVideoId = input.YoutubeVideoId,
+                    Title = videoData.items[0].snippet == null ? videoData.items[0].snippet!.title : "",
+                    ThumbnailUrl = videoData.items[0].snippet.thumbnails.high.url,
+                    ChannelId = videoData.items[0].snippet.channelId,
+                    ChannelName = videoData.items[0].snippet.channelTitle,
+                    Url = "https://www.youtube.com/embed/" + input.YoutubeVideoId,
+                    Description = videoData.items[0].snippet.description,
+                    Categories = input.Categories,
+                    CreateAt = DateTime.Today,
+                    AuthorDescription = input.AuthorDescription,
+                    AuthorTitle = input.AuthorTitle,
+                    AuthorName = userAuth!.Id.ToString(),
+                    AuthorId = userAuth.Id
+
+                };
+
+                await _context.Videos.AddAsync(insert);
+                await _context.SaveChangesAsync();
+
+                return Ok(new ResponseDto<DataVideo>
+                {
+                    success = true,
+                    data = new DataVideo
+                    {
+                        video = insert
+                    }
+                });
+            }
+            catch (System.Exception)
+            {
+                return BadRequest(new ResponseDto<DataVideo>
+                {
+                    message = "Failed to add video"
+                });
+            }
+        }
 
         // [HttpPut("{id}")]
         // public async Task<ActionResult<ResponseDto<DataVideo>>> UpdateVideo(int id, [FromBody] VideoUpdateDto input)
@@ -184,11 +204,17 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
         [HttpGet("woww")]
         public async Task<string> test()
         {
-            await GetVideoUsingYoutubeAPI("fCw2NZfR74E");
+            var videoData = await GetVideoUsingYoutubeAPI("fCw2NZfR74E");
+            if (videoData == null)
+            {
+                return "Wrong";
+            }
+
+            Console.WriteLine(videoData.items[0].snippet?.title);
             return "hello";
         }
 
-        public async Task<Video?> GetVideoUsingYoutubeAPI(string id)
+        public async Task<YoutubeApiResponseDto?> GetVideoUsingYoutubeAPI(string id)
         {
             string YOUTUBE_API_BASE_URL = "https://www.googleapis.com/youtube/v3";
             string YOUTUBE_API_VIDEOS_ENDPOINT = "videos";
@@ -197,17 +223,26 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
 
             string requestUri = $"{YOUTUBE_API_BASE_URL}/{YOUTUBE_API_VIDEOS_ENDPOINT}?key={API_KEY}&id={id}&part={PART}";
 
-            Console.WriteLine(requestUri);
-
-            var client = new HttpClient();
-            var response = await client.GetAsync(requestUri);
-            var responseBody = await response.Content.ReadFromJsonAsync<YoutubeApiResponseDto>();
-
-            if (responseBody != null)
+            try
             {
-                Console.WriteLine(responseBody.items[0].snippet?.thumbnails?.high?.url);
+                var client = new HttpClient();
+                var response = await client.GetAsync(requestUri);
+                if (response.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    Console.WriteLine("Fetching youtube api failed...");
+                    return null;
+                }
+
+                var responseBody = await response.Content.ReadFromJsonAsync<YoutubeApiResponseDto>();
+
+                return responseBody;
             }
-            return null;
+            catch (System.Exception e)
+            {
+                Console.WriteLine("Fetching youtube api failed...");
+                Console.WriteLine(e.Message);
+                return null;
+            }
         }
     }
 }
