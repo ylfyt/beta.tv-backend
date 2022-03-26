@@ -12,7 +12,7 @@ namespace src.Models
         public string ChannelId { get; set; } = string.Empty;
         public string ChannelName { get; set; } = string.Empty;
         public string Url { get; set; } = string.Empty;
-        public List<string>? Categories { get; set; } = new List<string>();
+        public List<string> Categories { get; set; } = new List<string>();
         public string Description { get; set; } = string.Empty;
         public string CreateAt { get; set; } = DateTime.Today.ToString();
         public string AuthorDescription { get; set; } = string.Empty;
