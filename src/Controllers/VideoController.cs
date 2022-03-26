@@ -5,6 +5,7 @@ using src.Dtos;
 using src.Interfaces;
 using src.Filters;
 using src.Dtos.video;
+using Dtos.video;
 
 namespace if3250_2022_01_buletin_backend.src.Controllers
 {
@@ -200,9 +201,12 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
 
             var client = new HttpClient();
             var response = await client.GetAsync(requestUri);
-            var responseBody = await response.Content.ReadAsStringAsync();
+            var responseBody = await response.Content.ReadFromJsonAsync<YoutubeApiResponseDto>();
 
-            Console.WriteLine(responseBody);
+            if (responseBody != null)
+            {
+                Console.WriteLine(responseBody.items[0].snippet?.thumbnails?.high?.url);
+            }
             return null;
         }
     }
