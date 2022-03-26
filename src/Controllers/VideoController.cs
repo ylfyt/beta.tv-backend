@@ -117,7 +117,7 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
                     Categories = input.Categories,
                     AuthorDescription = input.AuthorDescription,
                     AuthorTitle = input.AuthorTitle,
-                    AuthorName = userAuth!.Id.ToString(),
+                    AuthorName = userAuth!.Name,
                     AuthorId = userAuth.Id
 
                 };
