@@ -1,49 +1,79 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using src.Interfaces;
-using src.Dtos;
+using src.Models;
 
 namespace src.Filters
 {
-    public class AuthorizationCheckFilter : Attribute, IAuthorizationFilter
+    public class AuthorizationCheckFilter : Attribute, IAsyncAuthorizationFilter
     {
-        public void OnAuthorization(AuthorizationFilterContext context)
+        private int[] _filteredUserLevel = { };
+        public AuthorizationCheckFilter()
+        {
+        }
+
+        public AuthorizationCheckFilter(int l1 = -1, int l2 = -1, int l3 = -1, int l4 = -1)
+        {
+            List<int> temp = new List<int>();
+            if (l1 != -1) temp.Add(l1);
+            if (l2 != -1) temp.Add(l2);
+            if (l3 != -1) temp.Add(l3);
+            if (l4 != -1) temp.Add(l4);
+            _filteredUserLevel = temp.ToArray();
+        }
+        public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
             var _tm = context.HttpContext.RequestServices.GetService(typeof(ITokenManager)) as ITokenManager;
+            if (_tm == null)
+            {
+                SendUnauthorized(context);
+                return;
+            }
 
             if (!context.HttpContext.Request.Headers.ContainsKey("Authorization"))
             {
-                context.HttpContext.Response.StatusCode = 401;
-                object? data = null;
-                context.Result = new JsonResult(new
-                {
-                    success = false,
-                    message = "Unauthorized",
-                    data
-                });
+                SendUnauthorized(context);
+                return;
             }
-            else
+
+            try
             {
                 string token = context.HttpContext.Request.Headers.First(x => x.Key == "Authorization").Value;
-
-                // TODO: Verify Token
-                try
+                User user = await _tm.VerifyToken(token);
+                if (!IsQualified(user))
                 {
-                    var user = _tm?.VerifyToken(token);
-                    context.HttpContext.Items["user"] = user;
+                    SendUnauthorized(context);
+                    return;
                 }
-                catch (System.Exception)
-                {
-                    context.HttpContext.Response.StatusCode = 401;
-                    object? data = null;
-                    context.Result = new JsonResult(new
-                    {
-                        success = false,
-                        message = "Unauthorized",
-                        data
-                    });
-                }
+                context.HttpContext.Items["user"] = user;
             }
+            catch (System.Exception)
+            {
+                SendUnauthorized(context);
+            }
+
+        }
+
+        private bool IsQualified(User user)
+        {
+            if (_filteredUserLevel.Length == 0)
+            {
+                return true;
+            }
+
+            return _filteredUserLevel.Contains(user.level) ? true : false;
+        }
+
+        public void SendUnauthorized(AuthorizationFilterContext context)
+        {
+            context.HttpContext.Response.StatusCode = 401;
+            object? data = null;
+            context.Result = new JsonResult(new
+            {
+                success = false,
+                message = "Unauthorized",
+                data
+            });
         }
     }
 }

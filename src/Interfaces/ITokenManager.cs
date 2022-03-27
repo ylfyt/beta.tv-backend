@@ -6,6 +6,6 @@ namespace src.Interfaces
     {
         public Task<string> CreateToken(User user);
         public void hello();
-        public User VerifyToken(string token);
+        public Task<User> VerifyToken(string token);
     }
 }

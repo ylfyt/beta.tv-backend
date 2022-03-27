@@ -61,7 +61,7 @@ namespace src.Interfaces
             Console.WriteLine("Hello TM");
         }
 
-        public User VerifyToken(string token)
+        public async Task<User> VerifyToken(string token)
         {
             var claims = new JwtSecurityTokenHandler().ValidateToken(token,
                 new TokenValidationParameters
@@ -87,14 +87,14 @@ namespace src.Interfaces
             int userId = Int32.Parse(userIdClaim.Value);
             string username = usernameClaim.Value;
 
-            var logs = _context.TokenLogs.Where(x => x.UserId == userId).ToList();
+            var logs = await _context.TokenLogs.Where(x => x.UserId == userId).ToListAsync();
             if (logs.Count != 1)
                 throw new Exception("Not Authorized");
 
             if (!logs[0].Status)
                 throw new Exception("Not Authorized");
 
-            var user = _context.User.Find(userId);
+            var user = await _context.User.FindAsync(userId);
 
             if (user == null)
                 throw new Exception("Not Authorized");
