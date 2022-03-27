@@ -94,11 +94,12 @@ namespace src.Interfaces
             if (!logs[0].Status)
                 throw new Exception("Not Authorized");
 
-            return new User
-            {
-                Id = userId,
-                Username = username
-            };
+            var user = _context.User.Find(userId);
+
+            if (user == null)
+                throw new Exception("Not Authorized");
+
+            return user;
         }
     }
 }

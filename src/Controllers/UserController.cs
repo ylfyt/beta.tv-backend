@@ -29,23 +29,30 @@ namespace src.Controllers
         public async Task<ActionResult<ResponseDto<DataUser>>> me()
         {
             var userAuth = HttpContext.Items["user"] as User;
-            var user = await _context.User.FindAsync(userAuth!.Id);
-            if (user == null)
-            {
-                return NotFound(new ResponseDto<DataUser>
-                {
-                    message = "User Not Found"
-                });
-            }
 
             return Ok(new ResponseDto<DataUser>
             {
                 success = true,
                 data = new DataUser
                 {
-                    user = user
+                    user = userAuth!
                 }
             });
+        }
+        
+        [HttpGet]
+        public async Task<ActionResult<ResponseDto<DataUser>>> GetAllUser()
+        {
+            List<User> allUser = await _context.User.ToListAsync();
+            var response = new ResponseDto<DataUsers>
+            {
+                success = true,
+                data = new DataUsers
+                {
+                    users = allUser
+                }
+            };
+            return Ok(response);
         }
 
         [HttpPost("login")]
@@ -179,6 +186,30 @@ namespace src.Controllers
                 data = new DataUser
                 {
                     user = insert
+                }
+            });
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<ResponseDto<DataUser>>> DeleteUser(int id)
+        {
+            var deletedUser = await _context.User.Where(v => v.Id == id).ToListAsync();
+            if (deletedUser.Count != 1)
+            {
+                return NotFound(new ResponseDto<DataUser>
+                {
+                    message = "User doesn't exist"
+                });
+            }
+            _context.User.Remove(deletedUser[0]);
+            await _context.SaveChangesAsync();
+
+            return Ok(new ResponseDto<DataUser>
+            {
+                success = true,
+                data = new DataUser
+                {
+                    user = deletedUser[0]
                 }
             });
         }
