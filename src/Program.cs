@@ -1,4 +1,5 @@
 global using Microsoft.EntityFrameworkCore;
+global using src.utils;
 using src.Data;
 using src.Interfaces;
 

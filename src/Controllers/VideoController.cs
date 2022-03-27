@@ -84,7 +84,7 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
         }
 
         [HttpPost]
-        [AuthorizationCheckFilter]
+        [AuthorizationCheckFilter(UserLevel.ADMIN)]
         public async Task<ActionResult<ResponseDto<DataVideo>>> UploadVideo([FromBody] VideoAddDto input)
         {
             try
@@ -144,7 +144,7 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
         }
 
         [HttpPut("{id}")]
-        [AuthorizationCheckFilter]
+        [AuthorizationCheckFilter(UserLevel.ADMIN)]
         public async Task<ActionResult<ResponseDto<DataVideo>>> UpdateVideo(int id, [FromBody] VideoUpdateDto input)
         {
             try
@@ -204,7 +204,7 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
         }
 
         [HttpDelete("{id}")]
-        [AuthorizationCheckFilter]
+        [AuthorizationCheckFilter(UserLevel.ADMIN)]
         public async Task<ActionResult<ResponseDto<DataVideo>>> DeleteVideo(int id)
         {
             var deletedVideo = await _context.Videos.Where(v => v.Id == id).ToListAsync();

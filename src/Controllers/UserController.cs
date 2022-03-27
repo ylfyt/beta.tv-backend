@@ -85,7 +85,8 @@ namespace src.Controllers
                 success = true,
                 data = new DataUser
                 {
-                    user = users[0]
+                    user = users[0],
+                    token = token
                 }
             });
         }
@@ -185,7 +186,8 @@ namespace src.Controllers
                 success = true,
                 data = new DataUser
                 {
-                    user = insert
+                    user = insert,
+                    token = token
                 }
             });
         }
