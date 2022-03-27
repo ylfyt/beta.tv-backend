@@ -39,8 +39,9 @@ namespace src.Controllers
                 }
             });
         }
-        
+
         [HttpGet]
+        [AuthorizationCheckFilter(UserLevel.ADMIN)]
         public async Task<ActionResult<ResponseDto<DataUser>>> GetAllUser()
         {
             List<User> allUser = await _context.User.ToListAsync();
@@ -193,6 +194,7 @@ namespace src.Controllers
         }
 
         [HttpDelete("{id}")]
+        [AuthorizationCheckFilter(UserLevel.ADMIN)]
         public async Task<ActionResult<ResponseDto<DataUser>>> DeleteUser(int id)
         {
             var deletedUser = await _context.User.Where(v => v.Id == id).ToListAsync();
