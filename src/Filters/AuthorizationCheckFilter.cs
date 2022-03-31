@@ -61,7 +61,7 @@ namespace src.Filters
                 return true;
             }
 
-            return _filteredUserLevel.Contains(user.level) ? true : false;
+            return _filteredUserLevel.Contains(user.Level) ? true : false;
         }
 
         public void SendUnauthorized(AuthorizationFilterContext context)

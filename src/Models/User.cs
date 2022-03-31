@@ -11,7 +11,7 @@ namespace src.Models
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Username { get; set; } = string.Empty;
-        public int level { get; set; } = UserLevel.USER;
+        public int Level { get; set; } = UserLevel.USER;
         public string Email { get; set; } = string.Empty;
         [JsonIgnore]
         public string PasswordSalt { get; set; } = string.Empty;

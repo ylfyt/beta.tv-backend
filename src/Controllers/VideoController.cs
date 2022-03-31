@@ -64,14 +64,6 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
         public async Task<ActionResult<ResponseDto<DataVideos>>> GetVideoByCategory(string category)
         {
             var catVideos = await _context.Videos.Where(v => v.Categories.Contains(category)).ToListAsync();
-            if (catVideos.Count == 0)
-            {
-                return NotFound(new ResponseDto<DataVideos>
-                {
-                    message = "Video not found",
-                    data = new DataVideos()
-                });
-            }
 
             return Ok(new ResponseDto<DataVideos>
             {
