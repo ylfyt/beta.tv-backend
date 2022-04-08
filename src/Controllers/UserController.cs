@@ -9,6 +9,8 @@ using System;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using src.Dtos.user;
+using System.Text;
+using System.Net.Mail;
 
 namespace src.Controllers
 {
@@ -29,7 +31,15 @@ namespace src.Controllers
         public async Task<ActionResult<ResponseDto<DataUser>>> me()
         {
             var userAuth = HttpContext.Items["user"] as User;
-
+            var user = await _context.User.FindAsync(userAuth!.Id);
+            if (user == null)
+            {
+                return NotFound(new ResponseDto<DataUser>
+                {
+                    message = "User Not Found"
+                });
+            }
+            
             return Ok(new ResponseDto<DataUser>
             {
                 success = true,
@@ -182,6 +192,8 @@ namespace src.Controllers
 
             Response.Headers.Add("Authorization", token);
 
+            BuildEmailTemplate(insert.Id);
+
             return Ok(new ResponseDto<DataUser>
             {
                 success = true,
@@ -189,6 +201,30 @@ namespace src.Controllers
                 {
                     user = insert,
                     token = token
+                }
+            });
+        }
+
+        [HttpPost("Confirm/{userId}")]
+        public async Task<ActionResult<ResponseDto<DataUser>>> Confirm(int userId)
+        {
+            var user = await _context.User.FindAsync(userId);
+            if (user == null)
+            {
+                return NotFound(new ResponseDto<DataUser>
+                {
+                    message = "User Not Found"
+                });
+            }
+            user.IsConfirmed = true;
+            await _context.SaveChangesAsync();
+
+            return Ok(new ResponseDto<DataUser>
+            {
+                success = true,
+                data = new DataUser
+                {
+                    user = user
                 }
             });
         }
@@ -215,7 +251,89 @@ namespace src.Controllers
                 {
                     user = deletedUser[0]
                 }
-            });
+            }); 
+        }
+
+        /*public System.Web.Mvc.ActionResult Confirm(int id)
+        {
+            ViewBag.Id = id;
+            var user = _context.User.Where(x => x.Id == id).FirstOrDefaultAsync();
+            user.IsConfirmed = true;
+            _context.SaveChangesAsync();
+            return View();
+        }*/
+
+        /*public Microsoft.AspNetCore.Mvc.JsonResult RegisterConfirm(int id)
+        {
+            var user = _context.User.Where(x => x.Id == id).FirstOrDefaultAsync();
+            user.IsConfirmed = true;
+            _context.SaveChangesAsync();
+            var msg = "Your Email is verified!";
+            return System.Web.Mvc.JsonResult(new { });
+        }*/
+
+        private async void BuildEmailTemplate(int id)
+        {
+            string body = "<html><head></head><body><div><a href=\"@ViewBag.ConfirmationLink\">Here</a></div></body></html>";
+            try
+            {
+                body = System.IO.File.ReadAllText("../if3250_2022_buletin_backend/src/EmailTemplate/Text.cshtml");
+            }
+            catch
+            {
+            }
+            var regInfo = await _context.User.Where(x => x.Id == id).FirstOrDefaultAsync();
+            var url = "http://localhost:3000/" + "Confirm/" + id;
+            body = body.Replace("@ViewBag.ConfirmationLink", url);
+            body = body.ToString();
+            BuildEmailTemplate("Your Account is Successfully Created", body, regInfo.Email);
+        }
+
+        private void BuildEmailTemplate(string subjectText, string bodyText, string sendTo)
+        {
+            string from, to, bcc, cc, subject, body;
+            from = "13518014@std.stei.itb.ac.id";
+            to = sendTo.Trim();
+            bcc = "";
+            cc = "";
+            subject = subjectText;
+            StringBuilder sb = new StringBuilder();
+            sb.Append(bodyText);
+            body = sb.ToString();
+            MailMessage mail = new MailMessage();
+            mail.From = new MailAddress(from);
+            mail.To.Add(new MailAddress(to));
+            if (!string.IsNullOrEmpty(bcc))
+            {
+                mail.Bcc.Add(new MailAddress(bcc));
+            }
+            if (!string.IsNullOrEmpty(cc))
+            {
+                mail.CC.Add(new MailAddress(cc));
+            }
+            mail.Subject = subject;
+            mail.Body = body;
+            mail.IsBodyHtml = true;
+            SendEmail(mail);
+        }
+
+        public static void SendEmail(MailMessage mail)
+        {
+            SmtpClient client = new SmtpClient();
+            client.Host = "smtp.gmail.com";
+            client.Port = 587;
+            client.EnableSsl = true;
+            client.UseDefaultCredentials = false;
+            //client.DeliveryMethod = SmtpDeliveryMethod.Network;
+            client.Credentials = new System.Net.NetworkCredential(Credentials.SENDER_EMAIL, Credentials.SENDER_PASS);
+            try
+            {
+                client.Send(mail);
+            }
+            catch (SmtpException ex)
+            {
+                throw ex;
+            }
         }
     }
 }
