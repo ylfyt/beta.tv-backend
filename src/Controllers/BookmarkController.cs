@@ -26,11 +26,11 @@ namespace src.Controllers
         [HttpGet]
         public async Task<ActionResult<ResponseDto<DataBookmark>>> GetBookmark()
         {
-            List<Bookmark> bookmark = await _context.Bookmark.ToListAsync();
-            var response = new ResponseDto<DataBookmark>
+            var bookmark = await _context.Bookmark.ToListAsync();
+            var response = new ResponseDto<DataBookmarks>
             {
                 success = true,
-                data = new DataBookmark
+                data = new DataBookmarks
                 {
                     bookmark = bookmark
                 }
@@ -54,7 +54,7 @@ namespace src.Controllers
                 success = true,
                 data = new DataBookmark
                 {
-                    bookmark = targetBookmark
+                    bookmark = targetBookmark[0]
                 }
             };
             return Ok(response);
