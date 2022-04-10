@@ -16,8 +16,6 @@ namespace src.Models
         [ForeignKey("Channel")]
         [Column(Order=1)]
         public string ChannelId { get; set; } = string.Empty;
-        [Required]
-        [MaxLength(50, ErrorMessage = "Channel Name cannot be more than 50 characters!")]
         public string ChannelName { get; set; } = string.Empty;
         public string Url { get; set; } = string.Empty;
         public List<string> Categories { get; set; } = new List<string>();
