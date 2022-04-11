@@ -63,5 +63,40 @@ namespace src.Controllers
                 }
             };
         }
+
+        [HttpDelete("{id}")]
+        [AuthorizationCheckFilter]
+        public async Task<ActionResult<ResponseDto<DataCommentLike>>> DELETE(int id)
+        {
+            var like = await _context.CommentLikes.FindAsync(id);
+            if (like == null)
+            {
+                return BadRequest(new ResponseDto<DataCommentLike>
+                {
+                    message = "Like Not Found"
+                });
+            }
+            var user = HttpContext.Items["user"] as User;
+
+            if (like.UserId != user!.Id)
+            {
+                return Unauthorized(new ResponseDto<DataCommentLike>
+                {
+                    message = "Unauthorized to delete this like!"
+                });
+            }
+
+            _context.Remove(like);
+            await _context.SaveChangesAsync();
+
+            return new ResponseDto<DataCommentLike>
+            {
+                success = true,
+                data = new DataCommentLike
+                {
+                    like = like
+                }
+            };
+        }
     }
 }
