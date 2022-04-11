@@ -19,9 +19,13 @@ namespace src.Controllers
 
         [HttpGet]
         [AuthorizationCheckFilter]
-        public async Task<ActionResult<ResponseDto<DataComments>>> GET()
+        public async Task<ActionResult<ResponseDto<DataComments>>> GET(int? videoId)
         {
-            var comments = await _context.Comments.ToListAsync();
+            var comments =
+                videoId == null ?
+                await _context.Comments.ToListAsync() :
+                await _context.Comments.Where(c => c.VideoId == videoId).ToListAsync();
+
             return new ResponseDto<DataComments>
             {
                 success = true,
@@ -54,7 +58,6 @@ namespace src.Controllers
                 }
             };
         }
-
 
         [HttpPost]
         [AuthorizationCheckFilter]

@@ -60,22 +60,6 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
             });
         }
 
-        [HttpGet("{id}/comments")]
-        [AuthorizationCheckFilter]
-        public async Task<ActionResult<ResponseDto<DataComments>>> GetVideoComments(int id)
-        {
-            var comments = await _context.Comments.Where(c => c.VideoId == id).ToListAsync();
-
-            return Ok(new ResponseDto<DataComments>
-            {
-                success = true,
-                data = new DataComments
-                {
-                    comments = comments
-                }
-            });
-        }
-
         [HttpGet("category/{category}")]
         [AuthorizationCheckFilter]
         public async Task<ActionResult<ResponseDto<DataVideos>>> GetVideoByCategory(string category)
