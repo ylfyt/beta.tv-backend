@@ -27,7 +27,7 @@ namespace src.Controllers
                 success = true,
                 data = new DataCommentLikes
                 {
-                    likes = await _context.CommentLikes.Where(l => l.CommentId == commentId).ToListAsync()
+                    likes = await _context.CommentLikes.Where(l => l.CommentId == commentId).Include(l => l.Comment).ToListAsync()
                 }
             };
         }
@@ -64,11 +64,11 @@ namespace src.Controllers
             };
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete]
         [AuthorizationCheckFilter]
-        public async Task<ActionResult<ResponseDto<DataCommentLike>>> DELETE(int id)
+        public async Task<ActionResult<ResponseDto<DataCommentLike>>> DELETE(int commentId)
         {
-            var like = await _context.CommentLikes.FindAsync(id);
+            var like = await _context.CommentLikes.Where(l => l.CommentId == commentId).FirstAsync();
             if (like == null)
             {
                 return BadRequest(new ResponseDto<DataCommentLike>

@@ -23,8 +23,16 @@ namespace src.Controllers
         {
             var comments =
                 videoId == null ?
-                await _context.Comments.Include(c => c.User).ToListAsync() :
-                await _context.Comments.Where(c => c.VideoId == videoId).Include(c => c.User).ToListAsync();
+                await _context.Comments
+                .Include(c => c.User)
+                .Include(c => c.CommentLikes)
+                .ToListAsync()
+                :
+                await _context.Comments
+                .Where(c => c.VideoId == videoId)
+                .Include(c => c.User)
+                .Include(c => c.CommentLikes)
+                .ToListAsync();
 
             return new ResponseDto<DataComments>
             {
