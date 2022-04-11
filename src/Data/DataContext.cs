@@ -16,6 +16,7 @@ namespace src.Data
         public DbSet<Channel> Channels { get; set; } = null!;
         public DbSet<History> History { get; set; } = null!;
         public DbSet<Comment> Comments { get; set; } = null!;
+        public DbSet<CommentLike> CommentLikes { get; set; } = null!;
     }
 
 }
