@@ -82,6 +82,17 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
         {
             try
             {
+                var tempVideo = await _context.Videos.Where(v => v.YoutubeVideoId == input.YoutubeVideoId).ToListAsync();
+                if (tempVideo.Count != 0)
+                {
+                    return BadRequest(
+                        new ResponseDto<DataVideo>
+                        {
+                            message = "Video Already Exist"
+                        }
+                    );
+                }
+
                 var youtubeResponse = await GetVideoUsingYoutubeAPI(input.YoutubeVideoId);
 
                 if (youtubeResponse == null || youtubeResponse.pageInfo?.resultsPerPage == 0)

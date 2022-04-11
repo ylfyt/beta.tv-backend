@@ -26,13 +26,29 @@ namespace src.Controllers
                 await _context.Comments
                 .Include(c => c.User)
                 .Include(c => c.CommentLikes)
+                .OrderByDescending(c => c.CommentLikes.Count())
                 .ToListAsync()
                 :
                 await _context.Comments
                 .Where(c => c.VideoId == videoId)
                 .Include(c => c.User)
                 .Include(c => c.CommentLikes)
+                .OrderByDescending(c => c.CommentLikes.Count())
                 .ToListAsync();
+
+            var user = HttpContext.Items["user"] as User;
+
+            comments.ForEach(c =>
+            {
+                c.CommentLikes.ForEach(like =>
+                {
+                    if (like.UserId == user!.Id)
+                    {
+                        c.IsLiked = true;
+                        return;
+                    }
+                });
+            });
 
             return new ResponseDto<DataComments>
             {

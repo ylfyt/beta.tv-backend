@@ -39,12 +39,22 @@ namespace src.Controllers
             var comment = await _context.Comments.FindAsync(input.commentId);
             if (comment == null)
             {
-                return BadRequest(new ResponseDto<DataCommentLike>
+                return NotFound(new ResponseDto<DataCommentLike>
                 {
                     message = "Comment Not Found"
                 });
             }
             var user = HttpContext.Items["user"] as User;
+            var tempLike = await _context.CommentLikes.Where(l => l.UserId == user!.Id && l.CommentId == input.commentId).ToListAsync();
+
+            if (tempLike.Count != 0)
+            {
+                return BadRequest(new ResponseDto<DataCommentLike>
+                {
+                    message = "Already liked"
+                });
+            }
+
             var like = new CommentLike
             {
                 CommentId = comment.Id,
