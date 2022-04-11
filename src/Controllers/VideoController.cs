@@ -6,6 +6,7 @@ using src.Interfaces;
 using src.Filters;
 using src.Dtos.video;
 using Dtos.video;
+using src.Dtos.comment;
 
 namespace if3250_2022_01_buletin_backend.src.Controllers
 {
@@ -55,6 +56,22 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
                 data = new DataVideo
                 {
                     video = idVideos[0]
+                }
+            });
+        }
+
+        [HttpGet("{id}/comments")]
+        [AuthorizationCheckFilter]
+        public async Task<ActionResult<ResponseDto<DataComments>>> GetVideoComments(int id)
+        {
+            var comments = await _context.Comments.Where(c => c.VideoId == id).ToListAsync();
+
+            return Ok(new ResponseDto<DataComments>
+            {
+                success = true,
+                data = new DataComments
+                {
+                    comments = comments
                 }
             });
         }
