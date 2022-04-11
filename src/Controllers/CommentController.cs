@@ -23,8 +23,8 @@ namespace src.Controllers
         {
             var comments =
                 videoId == null ?
-                await _context.Comments.ToListAsync() :
-                await _context.Comments.Where(c => c.VideoId == videoId).ToListAsync();
+                await _context.Comments.Include(c => c.User).ToListAsync() :
+                await _context.Comments.Where(c => c.VideoId == videoId).Include(c => c.User).ToListAsync();
 
             return new ResponseDto<DataComments>
             {
