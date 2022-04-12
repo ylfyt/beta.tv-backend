@@ -78,25 +78,18 @@ namespace src.Controllers
         [AuthorizationCheckFilter]
         public async Task<ActionResult<ResponseDto<DataCommentLike>>> DELETE(int commentId)
         {
-            var like = await _context.CommentLikes.Where(l => l.CommentId == commentId).FirstAsync();
-            if (like == null)
+            var user = HttpContext.Items["user"] as User;
+            var likes = await _context.CommentLikes.Where(l => l.CommentId == commentId && l.UserId == user.Id).ToListAsync();
+
+            if (likes.Count == 0)
             {
                 return BadRequest(new ResponseDto<DataCommentLike>
                 {
                     message = "Like Not Found"
                 });
             }
-            var user = HttpContext.Items["user"] as User;
 
-            if (like.UserId != user!.Id)
-            {
-                return Unauthorized(new ResponseDto<DataCommentLike>
-                {
-                    message = "Unauthorized to delete this like!"
-                });
-            }
-
-            _context.Remove(like);
+            _context.Remove(likes[0]);
             await _context.SaveChangesAsync();
 
             return new ResponseDto<DataCommentLike>
@@ -104,7 +97,7 @@ namespace src.Controllers
                 success = true,
                 data = new DataCommentLike
                 {
-                    like = like
+                    like = likes[0]
                 }
             };
         }
