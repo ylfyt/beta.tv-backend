@@ -15,6 +15,7 @@ namespace src.Data
         public DbSet<Video> Videos { get; set; } = null!;
         public DbSet<Channel> Channels { get; set; } = null!;
         public DbSet<History> History { get; set; } = null!;
+        public DbSet<Bookmark> Bookmarks { get; set; } = null!;
     }
 
 }

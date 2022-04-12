@@ -8,6 +8,8 @@ using src.Data;
 using src.Models;
 using src.Dtos;
 using src.Dtos.bookmark;
+using src.Dtos.video;
+using src.Filters;
 
 namespace src.Controllers
 {
@@ -24,37 +26,57 @@ namespace src.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<ResponseDto<DataBookmark>>> GetBookmark()
+        [AuthorizationCheckFilter]
+        public async Task<ActionResult<ResponseDto<DataVideo>>> GetBookmark()
         {
-            var bookmark = await _context.Bookmark.ToListAsync();
-            var response = new ResponseDto<DataBookmarks>
+            var bookmarks = await _context.Bookmarks.ToListAsync();
+            List<Video> videoList = new List<Video>();
+            foreach (var bookmark in bookmarks)
+            {
+                var video = await _context.Videos.Where(v => v.Id == bookmark.Id_Video).ToListAsync();
+                if (video.Count != 1)
+                {
+                    continue;
+                }
+                videoList.Add(video[0]);
+            }
+            var response = new ResponseDto<DataVideos>
             {
                 success = true,
-                data = new DataBookmarks
+                data = new DataVideos
                 {
-                    bookmark = bookmark
+                    videos = videoList
                 }
             };
             return Ok(response);
         }
 
         [HttpGet("{Id_Bookmark}")]
-        public async Task<ActionResult<ResponseDto<DataBookmark>>> GetBookmarkById(int id)
+        [AuthorizationCheckFilter]
+        public async Task<ActionResult<ResponseDto<DataVideo>>> GetBookmarkById(int id)
         {
-            var targetBookmark = await _context.Bookmark.Where(v => v.Id_Bookmark == id).ToListAsync();
+            var targetBookmark = await _context.Bookmarks.Where(v => v.Id_Bookmark == id).ToListAsync();
             if (targetBookmark.Count != 1)
             {
                 return NotFound(new ResponseDto<DataBookmark>
                 {
+                    message = "Bookmark not found"
+                });
+            }
+            var video = await _context.Videos.Where(v => v.Id == targetBookmark[0].Id_Video).ToListAsync();
+            if (video.Count != 1)
+            {
+                return NotFound(new ResponseDto<DataVideo>
+                {
                     message = "Video not found"
                 });
             }
-            var response = new ResponseDto<DataBookmark>
+            var response = new ResponseDto<DataVideo>
             {
                 success = true,
-                data = new DataBookmark
+                data = new DataVideo
                 {
-                    bookmark = targetBookmark[0]
+                    video = video[0]
                 }
             };
             return Ok(response);
@@ -72,7 +94,7 @@ namespace src.Controllers
                     Id_User = input.Id_User
                 };
 
-                await _context.Bookmark.AddAsync(insert);
+                await _context.Bookmarks.AddAsync(insert);
                 await _context.SaveChangesAsync();
 
                 return Ok(new ResponseDto<DataBookmark>
@@ -96,7 +118,7 @@ namespace src.Controllers
         [HttpDelete("{Id_Bookmark}")]
         public async Task<ActionResult<ResponseDto<DataBookmark>>> DeleteBookmark(int id)
         {
-            var deletedBookmark = await _context.Bookmark.Where(v => v.Id_Bookmark == id).ToListAsync();
+            var deletedBookmark = await _context.Bookmarks.Where(v => v.Id_Bookmark == id).ToListAsync();
             if (deletedBookmark.Count != 1)
             {
                 return NotFound(new ResponseDto<DataBookmark>
@@ -104,7 +126,7 @@ namespace src.Controllers
                     message = "Video not found"
                 });
             }
-            _context.Bookmark.Remove(deletedBookmark[0]);
+            _context.Bookmarks.Remove(deletedBookmark[0]);
             await _context.SaveChangesAsync();
 
             return Ok(new ResponseDto<DataBookmark>

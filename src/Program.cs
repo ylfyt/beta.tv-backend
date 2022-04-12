@@ -27,6 +27,7 @@ builder.Services.AddDbContext<DataContext>(options =>
 
 // TODO: Pilih yang terbaik
 builder.Services.AddScoped<ITokenManager, TokenManager>();
+builder.Services.AddScoped<ITokenManager, EmailTokenManager>();
 // builder.Services.AddTransient<ITokenManager, TokenManager>();
 // builder.Services.AddSingleton<ITokenManager, TokenManager>();
 
