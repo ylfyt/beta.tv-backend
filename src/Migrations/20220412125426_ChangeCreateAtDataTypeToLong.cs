@@ -8,13 +8,7 @@ namespace if3250_2022_01_buletin_backend.src.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<long>(
-                name: "CreateAt",
-                table: "Videos",
-                type: "bigint",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "text");
+            migrationBuilder.Sql("ALTER TABLE \"Videos\" ALTER COLUMN \"CreateAt\" TYPE bigint USING \"CreateAt\"::bigint;");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
