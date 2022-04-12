@@ -17,6 +17,7 @@ namespace src.Data
         public DbSet<History> History { get; set; } = null!;
         public DbSet<Comment> Comments { get; set; } = null!;
         public DbSet<CommentLike> CommentLikes { get; set; } = null!;
+        public DbSet<Category> Categories { get; set; } = null!;
     }
 
 }

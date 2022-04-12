@@ -1,6 +1,7 @@
 global using Microsoft.EntityFrameworkCore;
 global using src.utils;
 using src.Data;
+using src.Dtos.category;
 using src.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,6 +30,8 @@ builder.Services.AddDbContext<DataContext>(options =>
 builder.Services.AddScoped<ITokenManager, TokenManager>();
 // builder.Services.AddTransient<ITokenManager, TokenManager>();
 // builder.Services.AddSingleton<ITokenManager, TokenManager>();
+builder.Services.AddScoped<IResponseGetter<DataCategory>, ResponseGetter<DataCategory>>();
+builder.Services.AddScoped<IResponseGetter<DataCategories>, ResponseGetter<DataCategories>>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
