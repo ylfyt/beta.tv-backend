@@ -10,7 +10,7 @@ namespace src.Models
         public int UserId { get; set; }
         public User User { get; set; }
         [JsonIgnore]
-        public List<CommentLike> CommentLikes { get; set; }
+        public List<CommentLike> CommentLikes { get; set; } = new List<CommentLike>();
         [NotMapped]
         public int CountLikes => CommentLikes.Count();
         [NotMapped]
