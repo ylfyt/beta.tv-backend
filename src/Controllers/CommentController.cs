@@ -28,6 +28,14 @@ namespace src.Controllers
         [AuthorizationCheckFilter]
         public async Task<ActionResult<Many>> GET(int? videoId)
         {
+            if (videoId != null)
+            {
+                var video = await _context.Videos.FindAsync(videoId);
+                if (video == null)
+                {
+                    return NotFound(_responseGetterMany.Error("Video not found"));
+                }
+            }
             var comments =
                 videoId == null ?
                 await _context.Comments

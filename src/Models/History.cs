@@ -11,6 +11,6 @@ namespace src.Models
         public int UserId { get; set; }
         [ForeignKey("Video")]
         public int VideoId { get; set; }
-        public DateTime Access_Video { get; set; }
+        public long AccessTime { get; set; } = DateTimeOffset.Now.ToUnixTimeSeconds();
     }
 }

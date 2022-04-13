@@ -7,8 +7,6 @@ namespace src.Dtos.bookmark
 {
     public class BookmarkAdd
     {
-        public int ChannelId { get; set; }
-        public int Id_Video { get; set; }
-        public int Id_User { get; set; }
+        public int VideoId { get; set; }
     }
 }
