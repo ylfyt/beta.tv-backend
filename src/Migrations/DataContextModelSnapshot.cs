@@ -23,31 +23,6 @@ namespace if3250_2022_01_buletin_backend.src.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("src.Models.Bookmark", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ChannelId")
-                        .HasColumnType("integer")
-                        .HasColumnOrder(1);
-
-                    b.Property<int>("Id_User")
-                        .HasColumnType("integer")
-                        .HasColumnOrder(3);
-
-                    b.Property<int>("Id_Video")
-                        .HasColumnType("integer")
-                        .HasColumnOrder(2);
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Bookmarks");
-                });
-
             modelBuilder.Entity("src.Models.Channel", b =>
                 {
                     b.Property<int>("Id")
@@ -65,30 +40,7 @@ namespace if3250_2022_01_buletin_backend.src.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Channels");
-                });
-
-            modelBuilder.Entity("src.Models.EmailTokenLog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Status")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("EmailTokenLogs");
+                    b.ToTable("Channels", (string)null);
                 });
 
             modelBuilder.Entity("src.Models.History", b =>
@@ -110,7 +62,7 @@ namespace if3250_2022_01_buletin_backend.src.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("History");
+                    b.ToTable("History", (string)null);
                 });
 
             modelBuilder.Entity("src.Models.Product", b =>
@@ -127,7 +79,7 @@ namespace if3250_2022_01_buletin_backend.src.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("src.Models.TokenLog", b =>
@@ -146,12 +98,11 @@ namespace if3250_2022_01_buletin_backend.src.Migrations
                         .HasColumnType("text");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("integer")
-                        .HasColumnOrder(1);
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.ToTable("TokenLogs");
+                    b.ToTable("TokenLogs", (string)null);
                 });
 
             modelBuilder.Entity("src.Models.User", b =>
@@ -165,9 +116,6 @@ namespace if3250_2022_01_buletin_backend.src.Migrations
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<bool>("IsConfirmed")
-                        .HasColumnType("boolean");
 
                     b.Property<int>("Level")
                         .HasColumnType("integer");
@@ -190,7 +138,7 @@ namespace if3250_2022_01_buletin_backend.src.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User");
+                    b.ToTable("User", (string)null);
                 });
 
             modelBuilder.Entity("src.Models.Video", b =>
@@ -203,8 +151,7 @@ namespace if3250_2022_01_buletin_backend.src.Migrations
 
                     b.Property<string>("AuthorDescription")
                         .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
+                        .HasColumnType("text");
 
                     b.Property<int>("AuthorId")
                         .HasColumnType("integer");
@@ -247,8 +194,7 @@ namespace if3250_2022_01_buletin_backend.src.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Url")
                         .IsRequired()
@@ -260,7 +206,7 @@ namespace if3250_2022_01_buletin_backend.src.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Videos");
+                    b.ToTable("Videos", (string)null);
                 });
 #pragma warning restore 612, 618
         }
