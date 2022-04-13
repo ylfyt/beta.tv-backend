@@ -5,6 +5,7 @@ namespace src.Dtos.video
     {
         //public int Id { get; set; }
         [Required]
+        [MinLength(3)]
         public string AuthorTitle { get; set; } = string.Empty;
         [Required]
         [StringLength(10000),MinLength(10)]

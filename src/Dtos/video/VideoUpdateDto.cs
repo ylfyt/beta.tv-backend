@@ -4,6 +4,7 @@ namespace src.Dtos.video
     public class VideoUpdateDto
     {
         [Required]
+        [MinLength(3)]
         public string AuthorTitle { get; set; } = string.Empty;
 
         public List<string> CategorySlugs { get; set; } = null!;
