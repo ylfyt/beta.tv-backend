@@ -17,9 +17,9 @@ namespace src.Models
         public string ChannelId { get; set; } = string.Empty;
         public string ChannelName { get; set; } = string.Empty;
         public string Url { get; set; } = string.Empty;
-        public List<string> Categories { get; set; } = new List<string>();
+        public List<Category> Categories { get; set; } = new List<Category>();
         public string Description { get; set; } = string.Empty;
-        public string CreateAt { get; set; } = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
+        public long CreateAt { get; set; } = DateTimeOffset.Now.ToUnixTimeSeconds();
         [Required]
         [MaxLength(1000, ErrorMessage = "Description of the Author cannot be more than 50 characters!")]
         public string AuthorDescription { get; set; } = string.Empty;

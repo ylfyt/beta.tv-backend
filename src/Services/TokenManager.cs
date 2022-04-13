@@ -3,8 +3,9 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using src.Models;
 using src.Data;
+using src.Interfaces;
 
-namespace src.Interfaces
+namespace src.Services
 {
     public class TokenManager : ITokenManager
     {

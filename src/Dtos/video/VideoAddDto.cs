@@ -6,6 +6,6 @@
         public string AuthorTitle { get; set; } = string.Empty;
         public string AuthorDescription { get; set; } = string.Empty;
         public string YoutubeVideoId { get; set; } = string.Empty;
-        public List<string> Categories { get; set; } = new List<string>();
+        public List<string> CategorySlugs { get; set; } = null!;
     }
 }

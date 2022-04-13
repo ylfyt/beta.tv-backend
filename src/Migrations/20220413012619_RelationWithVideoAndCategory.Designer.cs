@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using src.Data;
@@ -11,9 +12,10 @@ using src.Data;
 namespace if3250_2022_01_buletin_backend.src.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220413012619_RelationWithVideoAndCategory")]
+    partial class RelationWithVideoAndCategory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -75,7 +77,7 @@ namespace if3250_2022_01_buletin_backend.src.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Channels", (string)null);
+                    b.ToTable("Channels");
                 });
 
             modelBuilder.Entity("src.Models.Comment", b =>
@@ -151,7 +153,7 @@ namespace if3250_2022_01_buletin_backend.src.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("History", (string)null);
+                    b.ToTable("History");
                 });
 
             modelBuilder.Entity("src.Models.Product", b =>
@@ -168,7 +170,7 @@ namespace if3250_2022_01_buletin_backend.src.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("src.Models.TokenLog", b =>
@@ -191,7 +193,7 @@ namespace if3250_2022_01_buletin_backend.src.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TokenLogs", (string)null);
+                    b.ToTable("TokenLogs");
                 });
 
             modelBuilder.Entity("src.Models.User", b =>
@@ -227,7 +229,7 @@ namespace if3250_2022_01_buletin_backend.src.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User", (string)null);
+                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("src.Models.Video", b =>
@@ -290,7 +292,7 @@ namespace if3250_2022_01_buletin_backend.src.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Videos", (string)null);
+                    b.ToTable("Videos");
                 });
 
             modelBuilder.Entity("CategoryVideo", b =>
