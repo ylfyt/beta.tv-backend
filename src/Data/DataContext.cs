@@ -12,6 +12,7 @@ namespace src.Data
         public DbSet<Product> Products { get; set; } = null!;
         public DbSet<User> User { get; set; } = null!;
         public DbSet<TokenLog> TokenLogs { get; set; } = null!;
+        public DbSet<EmailTokenLog> EmailTokenLogs { get; set; } = null!;
         public DbSet<Video> Videos { get; set; } = null!;
         public DbSet<Channel> Channels { get; set; } = null!;
         public DbSet<History> History { get; set; } = null!;

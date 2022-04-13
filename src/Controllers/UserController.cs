@@ -20,8 +20,8 @@ namespace src.Controllers
     {
         private readonly DataContext _context;
         private readonly ITokenManager _tm;
-        private readonly ITokenManager _etm;
-        public UserController(ITokenManager tm, ITokenManager etm, DataContext context)
+        private readonly IEmailTokenManager _etm;
+        public UserController(ITokenManager tm, IEmailTokenManager etm, DataContext context)
         {
             _context = context;
             _tm = tm;
@@ -212,7 +212,7 @@ namespace src.Controllers
         [HttpPost("confirm/{eToken}")]
         public async Task<ActionResult<ResponseDto<DataUser>>> Confirm(string eToken)
         {
-            var userLog = await _context.TokenLogs.Where(x => x.Token == eToken).ToListAsync();
+            var userLog = await _context.EmailTokenLogs.Where(x => x.Token == eToken).ToListAsync();
             if (userLog.Count != 1)
             {
                 return NotFound(new ResponseDto<DataUser>

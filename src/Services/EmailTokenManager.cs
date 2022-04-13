@@ -6,7 +6,7 @@ using src.Data;
 
 namespace src.Interfaces
 {
-    public class EmailTokenManager : ITokenManager
+    public class EmailTokenManager : IEmailTokenManager
     {
         private readonly DataContext _context;
         public static int count { get; set; } = 0;
@@ -17,8 +17,8 @@ namespace src.Interfaces
         }
         public async Task<string> CreateToken(User user)
         {
-            var logs = await _context.TokenLogs.Where(x => x.UserId == user.Id).ToListAsync();
-            TokenLog log;
+            var logs = await _context.EmailTokenLogs.Where(x => x.UserId == user.Id).ToListAsync();
+            EmailTokenLog log;
 
             if (logs.Count != 1)
             {
@@ -36,13 +36,13 @@ namespace src.Interfaces
 
                 var token = new JwtSecurityTokenHandler().WriteToken(jwt);
 
-                log = new TokenLog
+                log = new EmailTokenLog
                 {
                     UserId = user.Id,
                     Token = token,
                     Status = true,
                 };
-                await _context.TokenLogs.AddAsync(log);
+                await _context.EmailTokenLogs.AddAsync(log);
             }
             else
             {
@@ -87,7 +87,7 @@ namespace src.Interfaces
             int userId = Int32.Parse(userIdClaim.Value);
             string userEmail = emailClaim.Value;
 
-            var logs = await _context.TokenLogs.Where(x => x.UserId == userId).ToListAsync();
+            var logs = await _context.EmailTokenLogs.Where(x => x.UserId == userId).ToListAsync();
             if (logs.Count != 1)
                 throw new Exception("Not Authorized");
 
