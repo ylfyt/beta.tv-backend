@@ -2,9 +2,10 @@ using src.Data;
 using src.Models;
 using Microsoft.AspNetCore.Mvc;
 using src.Filters;
-using src.Dtos;
-using src.Dtos.comment;
 using src.Dtos.commentLike;
+
+using One = src.Dtos.ResponseDto<src.Dtos.commentLike.DataCommentLike>;
+using Many = src.Dtos.ResponseDto<src.Dtos.commentLike.DataCommentLikes>;
 
 namespace src.Controllers
 {
@@ -13,46 +14,40 @@ namespace src.Controllers
     public class CommentLikeController : ControllerBase
     {
         private readonly DataContext _context;
-        public CommentLikeController(DataContext context)
+        private readonly IResponseGetter<DataCommentLike> _responseGetterSingle;
+        private readonly IResponseGetter<DataCommentLikes> _responseGetterMany;
+        public CommentLikeController(DataContext context, IResponseGetter<DataCommentLike> responseGetterSingle, IResponseGetter<DataCommentLikes> responseGetterMany)
         {
             _context = context;
+            _responseGetterSingle = responseGetterSingle;
+            _responseGetterMany = responseGetterMany;
         }
 
         [HttpGet]
         [AuthorizationCheckFilter]
-        public async Task<ActionResult<ResponseDto<DataCommentLikes>>> GET(int commentId)
+        public async Task<ActionResult<Many>> GET(int commentId)
         {
-            return new ResponseDto<DataCommentLikes>
+            return Ok(_responseGetterMany.Success(new DataCommentLikes
             {
-                success = true,
-                data = new DataCommentLikes
-                {
-                    likes = await _context.CommentLikes.Where(l => l.CommentId == commentId).Include(l => l.Comment).ToListAsync()
-                }
-            };
+                likes = await _context.CommentLikes.Where(l => l.CommentId == commentId).Include(l => l.Comment).ToListAsync()
+            }));
         }
 
         [HttpPost]
         [AuthorizationCheckFilter]
-        public async Task<ActionResult<ResponseDto<DataCommentLike>>> POST([FromBody] CreateLikeDto input)
+        public async Task<ActionResult<One>> POST([FromBody] CreateLikeDto input)
         {
             var comment = await _context.Comments.FindAsync(input.commentId);
             if (comment == null)
             {
-                return NotFound(new ResponseDto<DataCommentLike>
-                {
-                    message = "Comment Not Found"
-                });
+                return NotFound(_responseGetterSingle.Error("Comment Not Found"));
             }
             var user = HttpContext.Items["user"] as User;
             var tempLike = await _context.CommentLikes.Where(l => l.UserId == user!.Id && l.CommentId == input.commentId).ToListAsync();
 
             if (tempLike.Count != 0)
             {
-                return BadRequest(new ResponseDto<DataCommentLike>
-                {
-                    message = "Already liked"
-                });
+                return BadRequest(_responseGetterSingle.Error("Already liked"));
             }
 
             var like = new CommentLike
@@ -64,42 +59,31 @@ namespace src.Controllers
             _context.Add(like);
             await _context.SaveChangesAsync();
 
-            return new ResponseDto<DataCommentLike>
+            return Ok(_responseGetterSingle.Success(new DataCommentLike
             {
-                success = true,
-                data = new DataCommentLike
-                {
-                    like = like
-                }
-            };
+                like = like
+            }));
         }
 
         [HttpDelete]
         [AuthorizationCheckFilter]
-        public async Task<ActionResult<ResponseDto<DataCommentLike>>> DELETE(int commentId)
+        public async Task<ActionResult<One>> DELETE(int commentId)
         {
             var user = HttpContext.Items["user"] as User;
-            var likes = await _context.CommentLikes.Where(l => l.CommentId == commentId && l.UserId == user.Id).ToListAsync();
+            var likes = await _context.CommentLikes.Where(l => l.CommentId == commentId && l.UserId == user!.Id).ToListAsync();
 
             if (likes.Count == 0)
             {
-                return BadRequest(new ResponseDto<DataCommentLike>
-                {
-                    message = "Like Not Found"
-                });
+                return NotFound(_responseGetterSingle.Error("Like Not Found"));
             }
 
             _context.Remove(likes[0]);
             await _context.SaveChangesAsync();
 
-            return new ResponseDto<DataCommentLike>
+            return Ok(_responseGetterSingle.Success(new DataCommentLike
             {
-                success = true,
-                data = new DataCommentLike
-                {
-                    like = likes[0]
-                }
-            };
+                like = likes[0]
+            }));
         }
     }
 }

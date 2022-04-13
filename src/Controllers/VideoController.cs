@@ -2,11 +2,12 @@
 using src.Data;
 using src.Models;
 using src.Dtos;
-using src.Interfaces;
 using src.Filters;
 using src.Dtos.video;
 using Dtos.video;
-using src.Dtos.comment;
+
+using One = src.Dtos.ResponseDto<src.Dtos.video.DataVideo>;
+using Many = src.Dtos.ResponseDto<src.Dtos.video.DataVideos>;
 
 namespace if3250_2022_01_buletin_backend.src.Controllers
 {
@@ -15,99 +16,78 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
     public class VideoController : Controller
     {
         public readonly DataContext _context;
+        private readonly IResponseGetter<DataVideo> _responseGetterSingle;
+        private readonly IResponseGetter<DataVideos> _responseGetterMany;
 
-        public VideoController(DataContext context)
+        public VideoController(DataContext context, IResponseGetter<DataVideo> responseGetterSingle, IResponseGetter<DataVideos> responseGetterMany)
         {
             _context = context;
+            _responseGetterSingle = responseGetterSingle;
+            _responseGetterMany = responseGetterMany;
         }
 
         [HttpGet]
         [AuthorizationCheckFilter]
-        public async Task<ActionResult<ResponseDto<DataVideos>>> GetVideo()
+        public async Task<ActionResult<Many>> GetVideo()
         {
             List<Video> videos = await _context.Videos.Include(v => v.Categories).ToListAsync();
-            var response = new ResponseDto<DataVideos>
+
+            var response = _responseGetterMany.Success(new DataVideos
             {
-                success = true,
-                data = new DataVideos
-                {
-                    videos = videos
-                }
-            };
+                videos = videos
+            });
             return Ok(response);
         }
 
         [HttpGet("{id}")]
         [AuthorizationCheckFilter]
-        public async Task<ActionResult<ResponseDto<DataVideo>>> GetVideoById(int id)
+        public async Task<ActionResult<One>> GetVideoById(int id)
         {
             var video = await _context.Videos.Include(v => v.Categories).FirstOrDefaultAsync(v => v.Id == id);
             if (video == null)
             {
-                return NotFound(new ResponseDto<DataVideo>
-                {
-                    message = "Video not found"
-                });
+                return NotFound(_responseGetterSingle.Error("Video not found"));
             }
 
-            return Ok(new ResponseDto<DataVideo>
+            return Ok(_responseGetterSingle.Success(new DataVideo
             {
-                success = true,
-                data = new DataVideo
-                {
-                    video = video
-                }
-            });
+                video = video
+            }));
         }
 
         [HttpGet("category/{category}")]
         [AuthorizationCheckFilter]
-        public async Task<ActionResult<ResponseDto<DataVideos>>> GetVideoByCategory(string category)
+        public async Task<ActionResult<Many>> GetVideoByCategory(string category)
         {
             var catVideos = await _context.Categories.Where(c => c.Slug == category).Include(c => c.Videos).ToListAsync();
 
             if (catVideos.Count == 0)
             {
-                return NotFound(new ResponseDto<DataVideos>
-                {
-                    message = "Category not found!"
-                });
+                return NotFound(_responseGetterMany.Error("Category not found!"));
             }
 
-            return Ok(new ResponseDto<DataVideos>
+            return Ok(_responseGetterMany.Success(new DataVideos
             {
-                success = true,
-                data = new DataVideos
-                {
-                    videos = catVideos[0].Videos
-                }
-            });
+                videos = catVideos[0].Videos
+            }));
         }
 
         [HttpPost]
         [AuthorizationCheckFilter(UserLevel.ADMIN)]
-        public async Task<ActionResult<ResponseDto<DataVideo>>> UploadVideo([FromBody] VideoAddDto input)
+        public async Task<ActionResult<One>> UploadVideo([FromBody] VideoAddDto input)
         {
             try
             {
                 if (input.AuthorDescription == "" || input.AuthorTitle == "")
                 {
-                    return BadRequest(new ResponseDto<DataVideo>
-                    {
-                        message = "Title or Description Cannot empty",
-                    });
+                    return BadRequest(_responseGetterSingle.Error("Title or Description Cannot empty"));
                 }
 
                 var tempVideo = await _context.Videos.Where(v => v.YoutubeVideoId == input.YoutubeVideoId).ToListAsync();
 
                 if (tempVideo.Count != 0)
                 {
-                    return BadRequest(
-                        new ResponseDto<DataVideo>
-                        {
-                            message = "Video Already Exist"
-                        }
-                    );
+                    return BadRequest(_responseGetterSingle.Error("Video Already Exist"));
                 }
 
                 var categories = new List<Category>();
@@ -116,10 +96,7 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
                     var category = await _context.Categories.Where(c => c.Slug == slug).FirstOrDefaultAsync();
                     if (category == null)
                     {
-                        return BadRequest(new ResponseDto<DataVideo>
-                        {
-                            message = $"Category {slug} doesn't exist"
-                        });
+                        return BadRequest(_responseGetterSingle.Error($"Category {slug} doesn't exist"));
                     }
                     categories.Add(category);
                 }
@@ -129,12 +106,7 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
 
                 if (youtubeResponse == null || youtubeResponse.pageInfo?.resultsPerPage == 0)
                 {
-                    return BadRequest(
-                        new ResponseDto<DataVideo>
-                        {
-                            message = "Failed to upload video"
-                        }
-                    );
+                    return BadRequest(_responseGetterSingle.Error("Failed to upload video"));
                 }
 
                 var videoData = youtubeResponse.items[0];
@@ -161,56 +133,39 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
                 await _context.Videos.AddAsync(insert);
                 await _context.SaveChangesAsync();
 
-                return Ok(new ResponseDto<DataVideo>
+                return Ok(_responseGetterSingle.Success(new DataVideo
                 {
-                    success = true,
-                    data = new DataVideo
-                    {
-                        video = insert
-                    }
-                });
+                    video = insert
+                }));
             }
             catch (System.Exception)
             {
-                return BadRequest(new ResponseDto<DataVideo>
-                {
-                    message = "Failed to add video"
-                });
+                return BadRequest(_responseGetterSingle.Error("Failed to upload video"));
             }
         }
 
         [HttpPut("{id}")]
         [AuthorizationCheckFilter(UserLevel.ADMIN)]
-        public async Task<ActionResult<ResponseDto<DataVideo>>> UpdateVideo(int id, [FromBody] VideoUpdateDto input)
+        public async Task<ActionResult<One>> UpdateVideo(int id, [FromBody] VideoUpdateDto input)
         {
             try
             {
                 var selectedVideo = await _context.Videos.Where(v => v.Id == id).ToListAsync();
                 if (selectedVideo.Count != 1)
                 {
-                    return NotFound(new ResponseDto<DataVideo>
-                    {
-                        message = "Video not found",
-                    });
+                    return NotFound(_responseGetterSingle.Error("Video not found"));
                 }
 
                 var userAuth = HttpContext.Items["user"] as User;
 
                 if (selectedVideo[0].AuthorId != userAuth!.Id)
                 {
-                    return BadRequest(new ResponseDto<DataVideo>
-                    {
-                        message = "You are not allowed to edit this video!",
-                    });
+                    return Unauthorized(_responseGetterSingle.Error("You are not allowed to edit this video!"));
                 }
-
 
                 if (input.AuthorDescription == "" || input.AuthorTitle == "")
                 {
-                    return BadRequest(new ResponseDto<DataVideo>
-                    {
-                        message = "Title or Description Cannot empty",
-                    });
+                    return BadRequest(_responseGetterSingle.Error("Title or Description Cannot empty"));
                 }
 
                 var categories = new List<Category>();
@@ -219,10 +174,7 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
                     var category = await _context.Categories.Where(c => c.Slug == slug).FirstOrDefaultAsync();
                     if (category == null)
                     {
-                        return BadRequest(new ResponseDto<DataVideo>
-                        {
-                            message = $"Category {slug} doesn't exist"
-                        });
+                        return BadRequest(_responseGetterSingle.Error($"Category {slug} doesn't exist"));
                     }
                     categories.Add(category);
                 }
@@ -234,59 +186,42 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
 
                 await _context.SaveChangesAsync();
 
-                return Ok(new ResponseDto<DataVideo>
+                return Ok(_responseGetterSingle.Success(new DataVideo
                 {
-                    success = true,
-                    data = new DataVideo
-                    {
-                        video = selectedVideo[0]
-                    }
-                });
+                    video = selectedVideo[0]
+                }));
             }
             catch (System.Exception)
             {
-                return BadRequest(new ResponseDto<DataVideo>
-                {
-                    message = "Failed to edit video"
-                });
+                return BadRequest(_responseGetterSingle.Error("Failed to edit video"));
             }
         }
 
         [HttpDelete("{id}")]
         [AuthorizationCheckFilter(UserLevel.ADMIN)]
-        public async Task<ActionResult<ResponseDto<DataVideo>>> DeleteVideo(int id)
+        public async Task<ActionResult<One>> DeleteVideo(int id)
         {
             var video = await _context.Videos.FindAsync(id);
             if (video == null)
             {
-                return NotFound(new ResponseDto<DataVideo>
-                {
-                    message = "Video not found"
-                });
+                return NotFound(_responseGetterSingle.Error("Video not found"));
             }
             _context.Videos.Remove(video);
             await _context.SaveChangesAsync();
 
-            return Ok(new ResponseDto<DataVideo>
+            return Ok(_responseGetterSingle.Success(new DataVideo
             {
-                success = true,
-                data = new DataVideo
-                {
-                    video = video
-                }
-            });
+                video = video
+            }));
         }
 
         [HttpPost("search")]
         [AuthorizationCheckFilter]
-        public async Task<ActionResult<ResponseDto<DataVideos>>> GetVideoByQuery([FromBody] SearchVideoDto input)
+        public async Task<ActionResult<Many>> GetVideoByQuery([FromBody] SearchVideoDto input)
         {
             if (input.Query == "")
             {
-                return BadRequest(new ResponseDto<DataVideos>
-                {
-                    message = "Please input query"
-                });
+                return BadRequest(_responseGetterMany.Error("Please input query"));
             }
 
             var arr = input.Query.ToLower().Split(' ');
@@ -298,14 +233,10 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
                 videos.AddRange(newVideos);
             }
 
-            return Ok(new ResponseDto<DataVideos>
+            return Ok(_responseGetterMany.Success(new DataVideos
             {
-                success = true,
-                data = new DataVideos
-                {
-                    videos = videos
-                }
-            });
+                videos = videos
+            }));
         }
 
         private async Task<YoutubeApiResponseDto?> GetVideoUsingYoutubeAPI(string id)

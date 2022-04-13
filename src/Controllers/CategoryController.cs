@@ -1,7 +1,9 @@
 using src.Data;
 using Microsoft.AspNetCore.Mvc;
-using src.Dtos;
 using src.Dtos.category;
+
+using One = src.Dtos.ResponseDto<src.Dtos.category.DataCategory>;
+using Many = src.Dtos.ResponseDto<src.Dtos.category.DataCategories>;
 
 namespace src.Controllers
 {
@@ -10,35 +12,35 @@ namespace src.Controllers
     public class CategoryController : ControllerBase
     {
         private readonly DataContext _context;
-        private readonly IResponseGetter<DataCategory> _responseGetterCategory;
-        private readonly IResponseGetter<DataCategories> _responseGetterCategories;
-        public CategoryController(DataContext context, IResponseGetter<DataCategory> responseGetterCattegory, IResponseGetter<DataCategories> responseGetterCategories)
+        private readonly IResponseGetter<DataCategory> _responseGetterSingle;
+        private readonly IResponseGetter<DataCategories> _responseGetterMany;
+        public CategoryController(DataContext context, IResponseGetter<DataCategory> responseGetterSingle, IResponseGetter<DataCategories> responseGetterMany)
         {
             _context = context;
-            _responseGetterCategory = responseGetterCattegory;
-            _responseGetterCategories = responseGetterCategories;
+            _responseGetterSingle = responseGetterSingle;
+            _responseGetterMany = responseGetterMany;
         }
 
         [HttpGet]
-        public async Task<ActionResult<ResponseDto<DataCategories>>> GET()
+        public async Task<ActionResult<Many>> GET()
         {
             var categories = await _context.Categories.ToListAsync();
-            return Ok(_responseGetterCategories.Success(new DataCategories
+            return Ok(_responseGetterMany.Success(new DataCategories
             {
                 categories = categories
             }));
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ResponseDto<DataCategory>>> GET(int id)
+        public async Task<ActionResult<One>> GET(int id)
         {
             var category = await _context.Categories.FindAsync(id);
             if (category == null)
             {
-                return NotFound(_responseGetterCategory.Error());
+                return NotFound(_responseGetterSingle.Error());
             }
 
-            return Ok(_responseGetterCategory.Success(new DataCategory
+            return Ok(_responseGetterSingle.Success(new DataCategory
             {
                 category = category
             }));

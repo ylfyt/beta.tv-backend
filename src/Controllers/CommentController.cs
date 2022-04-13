@@ -2,8 +2,10 @@ using src.Data;
 using src.Models;
 using Microsoft.AspNetCore.Mvc;
 using src.Filters;
-using src.Dtos;
 using src.Dtos.comment;
+
+using One = src.Dtos.ResponseDto<src.Dtos.comment.DataComment>;
+using Many = src.Dtos.ResponseDto<src.Dtos.comment.DataComments>;
 
 namespace src.Controllers
 {
@@ -12,14 +14,19 @@ namespace src.Controllers
     public class CommentController : ControllerBase
     {
         private readonly DataContext _context;
-        public CommentController(DataContext context)
+        private readonly IResponseGetter<DataComment> _responseGetterOne;
+        private readonly IResponseGetter<DataComments> _responseGetterMany;
+
+        public CommentController(DataContext context, IResponseGetter<DataComment> responseGetterSingle, IResponseGetter<DataComments> responseGetterMany)
         {
             _context = context;
+            _responseGetterOne = responseGetterSingle;
+            _responseGetterMany = responseGetterMany;
         }
 
         [HttpGet]
         [AuthorizationCheckFilter]
-        public async Task<ActionResult<ResponseDto<DataComments>>> GET(int? videoId)
+        public async Task<ActionResult<Many>> GET(int? videoId)
         {
             var comments =
                 videoId == null ?
@@ -50,58 +57,41 @@ namespace src.Controllers
                 });
             });
 
-            return new ResponseDto<DataComments>
+            return Ok(_responseGetterMany.Success(new DataComments
             {
-                success = true,
-                data = new DataComments
-                {
-                    comments = comments
-                }
-            };
+                comments = comments
+            }));
         }
 
         [HttpGet("{id}")]
         [AuthorizationCheckFilter]
-        public async Task<ActionResult<ResponseDto<DataComment>>> GET(int id)
+        public async Task<ActionResult<One>> GET(int id)
         {
             var comment = await _context.Comments.FindAsync(id);
             if (comment == null)
             {
-                return NotFound(new ResponseDto<DataComment>
-                {
-                    message = "Comment not found!"
-                });
+                return NotFound(_responseGetterOne.Error("Comment not found!"));
             }
 
-            return new ResponseDto<DataComment>
+            return Ok(_responseGetterOne.Success(new DataComment
             {
-                success = true,
-                data = new DataComment
-                {
-                    comment = comment
-                }
-            };
+                comment = comment
+            }));
         }
 
         [HttpPost]
         [AuthorizationCheckFilter]
-        public async Task<ActionResult<ResponseDto<DataComment>>> POST([FromBody] CreateCommentDto input)
+        public async Task<ActionResult<One>> POST([FromBody] CreateCommentDto input)
         {
             if (input.text == string.Empty)
             {
-                return BadRequest(new ResponseDto<DataComment>
-                {
-                    message = "Please input comment text!"
-                });
+                return BadRequest(_responseGetterOne.Error("Please input comment text!"));
             }
 
             var video = await _context.Videos.FindAsync(input.videoId);
             if (video == null)
             {
-                return BadRequest(new ResponseDto<DataComment>
-                {
-                    message = "Invalid video Id"
-                });
+                return BadRequest(_responseGetterOne.Error("Invalid video Id"));
             }
 
             var user = HttpContext.Items["user"] as User;
@@ -116,91 +106,64 @@ namespace src.Controllers
             await _context.Comments.AddAsync(comment);
             await _context.SaveChangesAsync();
 
-            return new ResponseDto<DataComment>
+            return Ok(_responseGetterOne.Success(new DataComment
             {
-                success = true,
-                data = new DataComment
-                {
-                    comment = comment
-                }
-            };
+                comment = comment
+            }));
         }
 
         [HttpPut("{id}")]
         [AuthorizationCheckFilter]
-        public async Task<ActionResult<ResponseDto<DataComment>>> PUT(int id, [FromBody] UpdateCommentDto input)
+        public async Task<ActionResult<One>> PUT(int id, [FromBody] UpdateCommentDto input)
         {
             if (input.text == string.Empty)
             {
-                return BadRequest(new ResponseDto<DataComment>
-                {
-                    message = "Please input comment text!"
-                });
+                return BadRequest(_responseGetterOne.Error("Please input comment text!"));
             }
 
             var comment = await _context.Comments.FindAsync(id);
             if (comment == null)
             {
-                return NotFound(new ResponseDto<DataComment>
-                {
-                    message = "Comment not found!"
-                });
+                return NotFound(_responseGetterOne.Error("Comment not found!"));
             }
 
             var user = HttpContext.Items["user"] as User;
             if (comment.UserId != user!.Id)
             {
-                return Unauthorized(new ResponseDto<DataComment>
-                {
-                    message = "Unauthorized to edit this comment!"
-                });
+                return Unauthorized(_responseGetterOne.Error("Unauthorized to edit this comment!"));
             }
             comment.Text = input.text;
             await _context.SaveChangesAsync();
 
-            return new ResponseDto<DataComment>
+            return Ok(_responseGetterOne.Success(new DataComment
             {
-                success = true,
-                data = new DataComment
-                {
-                    comment = comment
-                }
-            };
+                comment = comment
+            }));
         }
 
         [HttpDelete("{id}")]
         [AuthorizationCheckFilter]
-        public async Task<ActionResult<ResponseDto<DataComment>>> DELETE(int id)
+        public async Task<ActionResult<One>> DELETE(int id)
         {
             var comment = await _context.Comments.FindAsync(id);
             if (comment == null)
             {
-                return NotFound(new ResponseDto<DataComment>
-                {
-                    message = "Comment not found!"
-                });
+                return NotFound(_responseGetterOne.Error("Comment not found!"));
             }
 
             var user = HttpContext.Items["user"] as User;
             if (comment.UserId != user!.Id)
             {
-                return Unauthorized(new ResponseDto<DataComment>
-                {
-                    message = "Unauthorized to delete this comment!"
-                });
+                return Unauthorized(_responseGetterOne.Error("Unauthorized to delete this comment!"));
             }
 
             _context.Comments.Remove(comment);
             await _context.SaveChangesAsync();
 
-            return new ResponseDto<DataComment>
+            return Ok(_responseGetterOne.Success(new DataComment
             {
-                success = true,
-                data = new DataComment
-                {
-                    comment = comment
-                }
-            };
+                comment = comment
+            }));
         }
     }
 }
