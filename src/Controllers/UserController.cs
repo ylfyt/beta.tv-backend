@@ -20,10 +20,12 @@ namespace src.Controllers
     {
         private readonly DataContext _context;
         private readonly ITokenManager _tm;
-        public UserController(ITokenManager tm, DataContext context)
+        private readonly IEmailTokenManager _etm;
+        public UserController(ITokenManager tm, IEmailTokenManager etm, DataContext context)
         {
             _context = context;
             _tm = tm;
+            _etm = etm;
         }
 
         [HttpGet("me")]
@@ -192,7 +194,9 @@ namespace src.Controllers
 
             Response.Headers.Add("Authorization", token);
 
-            BuildEmailTemplate(insert.Id);
+            string eToken = await _etm.CreateToken(insert);
+
+            BuildEmailTemplate(insert.Id, insert.Email, eToken);
 
             return Ok(new ResponseDto<DataUser>
             {
@@ -205,10 +209,18 @@ namespace src.Controllers
             });
         }
 
-        [HttpPost("Confirm/{userId}")]
-        public async Task<ActionResult<ResponseDto<DataUser>>> Confirm(int userId)
+        [HttpPost("confirm/{eToken}")]
+        public async Task<ActionResult<ResponseDto<DataUser>>> Confirm(string eToken)
         {
-            var user = await _context.User.FindAsync(userId);
+            var userLog = await _context.EmailTokenLogs.Where(x => x.Token == eToken).ToListAsync();
+            if (userLog.Count != 1)
+            {
+                return NotFound(new ResponseDto<DataUser>
+                {
+                    message = "Token Not Found"
+                });
+            }
+            var user = await _context.User.FindAsync(userLog[0].UserId);
             if (user == null)
             {
                 return NotFound(new ResponseDto<DataUser>
@@ -272,7 +284,7 @@ namespace src.Controllers
             return System.Web.Mvc.JsonResult(new { });
         }*/
 
-        private async void BuildEmailTemplate(int id)
+        private async void BuildEmailTemplate(int id, string email, string eToken)
         {
             string body = "<html><head></head><body><div><a href=\"@ViewBag.ConfirmationLink\">Here</a></div></body></html>";
             try
@@ -282,17 +294,17 @@ namespace src.Controllers
             catch
             {
             }
-            var regInfo = await _context.User.Where(x => x.Id == id).FirstOrDefaultAsync();
-            var url = "http://localhost:3000/" + "Confirm/" + id;
+            var regInfo = email;
+            var url = "http://localhost:3000/" + "confirm/" + eToken;
             body = body.Replace("@ViewBag.ConfirmationLink", url);
             body = body.ToString();
-            BuildEmailTemplate("Your Account is Successfully Created", body, regInfo.Email);
+            BuildEmailTemplate("Your Account is Successfully Created", body, regInfo);
         }
 
         private void BuildEmailTemplate(string subjectText, string bodyText, string sendTo)
         {
             string from, to, bcc, cc, subject, body;
-            from = "13518014@std.stei.itb.ac.id";
+            from = "ignatiusdavidpartogi@gmail.com";
             to = sendTo.Trim();
             bcc = "";
             cc = "";

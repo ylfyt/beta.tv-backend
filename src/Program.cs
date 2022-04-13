@@ -14,7 +14,7 @@ if (connectionString == null)
 }
 else
 {
-    Console.WriteLine("Get onnection string from environment");
+    Console.WriteLine("Get connection string from environment");
 }
 Console.WriteLine(connectionString);
 Console.WriteLine("===============================");
@@ -27,6 +27,7 @@ builder.Services.AddDbContext<DataContext>(options =>
 
 // TODO: Pilih yang terbaik
 builder.Services.AddScoped<ITokenManager, TokenManager>();
+builder.Services.AddScoped<IEmailTokenManager, EmailTokenManager>();
 // builder.Services.AddTransient<ITokenManager, TokenManager>();
 // builder.Services.AddSingleton<ITokenManager, TokenManager>();
 

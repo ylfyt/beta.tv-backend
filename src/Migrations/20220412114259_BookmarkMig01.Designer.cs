@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using src.Data;
@@ -12,9 +13,10 @@ using src.Data;
 namespace if3250_2022_01_buletin_backend.src.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220412114259_BookmarkMig01")]
+    partial class BookmarkMig01
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -63,29 +65,6 @@ namespace if3250_2022_01_buletin_backend.src.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Channels");
-                });
-
-            modelBuilder.Entity("src.Models.EmailTokenLog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Status")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("EmailTokenLogs");
                 });
 
             modelBuilder.Entity("src.Models.History", b =>
@@ -199,12 +178,10 @@ namespace if3250_2022_01_buletin_backend.src.Migrations
 
                     b.Property<string>("AuthorDescription")
                         .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
+                        .HasColumnType("text");
 
                     b.Property<int>("AuthorId")
-                        .HasColumnType("integer")
-                        .HasColumnOrder(2);
+                        .HasColumnType("integer");
 
                     b.Property<string>("AuthorName")
                         .IsRequired()
@@ -220,13 +197,11 @@ namespace if3250_2022_01_buletin_backend.src.Migrations
 
                     b.Property<string>("ChannelId")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnOrder(1);
+                        .HasColumnType("text");
 
                     b.Property<string>("ChannelName")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ChannelThumbnailUrl")
                         .IsRequired()
@@ -246,8 +221,7 @@ namespace if3250_2022_01_buletin_backend.src.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Url")
                         .IsRequired()
