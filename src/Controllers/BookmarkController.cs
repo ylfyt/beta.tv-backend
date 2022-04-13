@@ -55,7 +55,7 @@ namespace src.Controllers
         [AuthorizationCheckFilter]
         public async Task<ActionResult<ResponseDto<DataVideo>>> GetBookmarkById(int id)
         {
-            var targetBookmark = await _context.Bookmarks.Where(v => v.Id_Bookmark == id).ToListAsync();
+            var targetBookmark = await _context.Bookmarks.Where(v => v.Id == id).ToListAsync();
             if (targetBookmark.Count != 1)
             {
                 return NotFound(new ResponseDto<DataBookmark>
@@ -115,10 +115,10 @@ namespace src.Controllers
             }
         }
 
-        [HttpDelete("{Id_Bookmark}")]
+        [HttpDelete("{id}")]
         public async Task<ActionResult<ResponseDto<DataBookmark>>> DeleteBookmark(int id)
         {
-            var deletedBookmark = await _context.Bookmarks.Where(v => v.Id_Bookmark == id).ToListAsync();
+            var deletedBookmark = await _context.Bookmarks.Where(v => v.Id == id).ToListAsync();
             if (deletedBookmark.Count != 1)
             {
                 return NotFound(new ResponseDto<DataBookmark>

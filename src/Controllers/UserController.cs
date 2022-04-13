@@ -41,7 +41,7 @@ namespace src.Controllers
                     message = "User Not Found"
                 });
             }
-            
+
             return Ok(new ResponseDto<DataUser>
             {
                 success = true,
@@ -263,7 +263,7 @@ namespace src.Controllers
                 {
                     user = deletedUser[0]
                 }
-            }); 
+            });
         }
 
         /*public System.Web.Mvc.ActionResult Confirm(int id)
@@ -344,7 +344,7 @@ namespace src.Controllers
             }
             catch (SmtpException ex)
             {
-                throw ex;
+                Console.WriteLine("Error in SendEmail: " + ex.Message);
             }
         }
     }

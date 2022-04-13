@@ -9,12 +9,11 @@ namespace src.Models
         public int Id { get; set; }
         public string YoutubeVideoId { get; set; } = string.Empty;
         [Required]
-        [MaxLength(50, ErrorMessage = "Title of the Video cannot be more than 50 characters!")]
+        [MaxLength(256, ErrorMessage = "Title of the Video cannot be more than 50 characters!")]
         public string Title { get; set; } = string.Empty;
         public string ThumbnailUrl { get; set; } = string.Empty;
         public string ChannelThumbnailUrl { get; set; } = string.Empty;
         [ForeignKey("Channel")]
-        [Column(Order=1)]
         public string ChannelId { get; set; } = string.Empty;
         public string ChannelName { get; set; } = string.Empty;
         public string Url { get; set; } = string.Empty;
@@ -26,7 +25,6 @@ namespace src.Models
         public string AuthorDescription { get; set; } = string.Empty;
         public string AuthorTitle { get; set; } = string.Empty;
         [ForeignKey("User")]
-        [Column(Order=2)]
         public int AuthorId { get; set; }
         public string AuthorName { get; set; } = string.Empty;
     }
