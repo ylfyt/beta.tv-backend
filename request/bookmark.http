@@ -1,0 +1,22 @@
+@BASE_URL=http://localhost:5000/api
+
+GET {{BASE_URL}}/bookmark HTTP/1.1
+Authorization: eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJ1c2VybmFtZSI6ImFkbWluIn0.WoTKCtz0wyHdS3vFW0EbjcMaP_5WnCcW1X3gXSvW5lo18xo7BDcwCl_rThQCM92yyObHVXXfTvAk3XFtsH7XLg
+
+###
+POST {{BASE_URL}}/bookmark HTTP/1.1
+Authorization: eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJ1c2VybmFtZSI6ImFkbWluIn0.WoTKCtz0wyHdS3vFW0EbjcMaP_5WnCcW1X3gXSvW5lo18xo7BDcwCl_rThQCM92yyObHVXXfTvAk3XFtsH7XLg
+Content-Type: application/json
+
+{
+    "videoId" : 1
+}
+
+###
+DELETE  {{BASE_URL}}/bookmark/1 HTTP/1.1
+Authorization: eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJ1c2VybmFtZSI6ImFkbWluIn0.WoTKCtz0wyHdS3vFW0EbjcMaP_5WnCcW1X3gXSvW5lo18xo7BDcwCl_rThQCM92yyObHVXXfTvAk3XFtsH7XLg
+Content-Type: application/json
+
+{
+    "videoId" : 1
+}

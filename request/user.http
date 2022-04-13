@@ -1,0 +1,31 @@
+@BASE_URL=http://localhost:5000/api
+
+POST {{BASE_URL}}/user/register 
+Content-Type: application/json
+
+{
+    "name" : "Admin Beta.TV",
+    "username" : "admin",
+    "email" : "admin@beta.tv",
+    "password" : "123"
+}
+
+###
+
+POST {{BASE_URL}}/user/login
+Content-Type: application/json
+
+{
+    "username" : "admin",
+    "password" : "123"
+}
+
+###
+
+GET {{BASE_URL}}/user/me
+Authorization: eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJ1c2VybmFtZSI6ImFkbWluIn0.WoTKCtz0wyHdS3vFW0EbjcMaP_5WnCcW1X3gXSvW5lo18xo7BDcwCl_rThQCM92yyObHVXXfTvAk3XFtsH7XLg
+
+###
+
+GET {{BASE_URL}}/user/
+Authorization: eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJ1c2VybmFtZSI6ImFkbWluIn0.WoTKCtz0wyHdS3vFW0EbjcMaP_5WnCcW1X3gXSvW5lo18xo7BDcwCl_rThQCM92yyObHVXXfTvAk3XFtsH7XLg

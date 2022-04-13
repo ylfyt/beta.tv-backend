@@ -1,0 +1,26 @@
+@BASE_URL=http://localhost:5000/api
+
+GET {{BASE_URL}}/category HTTP/1.1
+Authorization: eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIiLCJ1c2VybmFtZSI6ImF5dSJ9.4u-5DYlr8xbsAMpVxpZizfVq0pUVDTlNThz8g44KpZiav5igmOo5BMAUno1JUZSYCfhjDMOix6qiAbb8CH8Abw
+
+###
+POST {{BASE_URL}}/category HTTP/1.1
+Authorization: eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJ1c2VybmFtZSI6ImFkbWluIn0.WoTKCtz0wyHdS3vFW0EbjcMaP_5WnCcW1X3gXSvW5lo18xo7BDcwCl_rThQCM92yyObHVXXfTvAk3XFtsH7XLg
+Content-Type: application/json
+
+{
+    "label" : "Tech"
+}
+
+###
+PUT {{BASE_URL}}/category/3 HTTP/1.1
+Authorization: eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIiLCJ1c2VybmFtZSI6ImFkbWluIn0.J0nJfthveOM1DMX6Sp3Izcvs5a5vFuhTNdNO0vWfZXOkNqQAce943Dh7iQYh3KRGs38-SkrK3QWf9CSMBLetKg
+Content-Type: application/json
+
+{
+    "label" : "Tutorial"
+}
+
+###
+DELETE  {{BASE_URL}}/category/3 HTTP/1.1
+Authorization: eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIiLCJ1c2VybmFtZSI6ImFkbWluIn0.J0nJfthveOM1DMX6Sp3Izcvs5a5vFuhTNdNO0vWfZXOkNqQAce943Dh7iQYh3KRGs38-SkrK3QWf9CSMBLetKg

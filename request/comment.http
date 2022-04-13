@@ -1,0 +1,35 @@
+@BASE_URL=http://localhost:5000/api
+
+GET {{BASE_URL}}/comment/ HTTP/1.1
+Authorization: eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJ1c2VybmFtZSI6ImFkbWluIn0.WoTKCtz0wyHdS3vFW0EbjcMaP_5WnCcW1X3gXSvW5lo18xo7BDcwCl_rThQCM92yyObHVXXfTvAk3XFtsH7XLg
+
+###
+GET {{BASE_URL}}/comment?videoId=1 HTTP/1.1
+Authorization: eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJ1c2VybmFtZSI6ImFkbWluIn0.WoTKCtz0wyHdS3vFW0EbjcMaP_5WnCcW1X3gXSvW5lo18xo7BDcwCl_rThQCM92yyObHVXXfTvAk3XFtsH7XLg
+
+###
+GET {{BASE_URL}}/comment/3 HTTP/1.1
+Authorization: eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJ1c2VybmFtZSI6ImFkbWluIn0.WoTKCtz0wyHdS3vFW0EbjcMaP_5WnCcW1X3gXSvW5lo18xo7BDcwCl_rThQCM92yyObHVXXfTvAk3XFtsH7XLg
+
+###
+POST {{BASE_URL}}/comment/ HTTP/1.1
+Authorization: eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJ1c2VybmFtZSI6ImFkbWluIn0.WoTKCtz0wyHdS3vFW0EbjcMaP_5WnCcW1X3gXSvW5lo18xo7BDcwCl_rThQCM92yyObHVXXfTvAk3XFtsH7XLg
+Content-Type: application/json
+
+{
+    "videoId" : 1,
+    "text" : "Tutorial sangat membantu"
+}
+
+###
+PUT {{BASE_URL}}/comment/1 HTTP/1.1
+Authorization: eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIiLCJ1c2VybmFtZSI6ImF5dSJ9.4u-5DYlr8xbsAMpVxpZizfVq0pUVDTlNThz8g44KpZiav5igmOo5BMAUno1JUZSYCfhjDMOix6qiAbb8CH8Abw
+Content-Type: application/json
+
+{
+    "text" : "Wajib coba guys!!!!!!!!!!!!!!!!!!!!!!!!!"
+}
+
+###
+DELETE  {{BASE_URL}}/comment/1 HTTP/1.1
+Authorization: eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIiLCJ1c2VybmFtZSI6ImF5dSJ9.4u-5DYlr8xbsAMpVxpZizfVq0pUVDTlNThz8g44KpZiav5igmOo5BMAUno1JUZSYCfhjDMOix6qiAbb8CH8Abw

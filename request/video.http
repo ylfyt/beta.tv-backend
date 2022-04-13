@@ -1,0 +1,56 @@
+@BASE_URL=http://localhost:5000/api
+
+GET {{BASE_URL}}/video HTTP/1.1
+Authorization: eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJ1c2VybmFtZSI6ImFkbWluIn0.WoTKCtz0wyHdS3vFW0EbjcMaP_5WnCcW1X3gXSvW5lo18xo7BDcwCl_rThQCM92yyObHVXXfTvAk3XFtsH7XLg
+
+###
+GET {{BASE_URL}}/video/6 HTTP/1.1
+Authorization: eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJ1c2VybmFtZSI6ImF5dSJ9.zbr3VvKssiCMY91Qd6o6nMolfDdmGkqSHLfn589YDDIhoMzLVNwDraSmm_ad-UdHSFR38VfZRQXEiqMNZnb7vg
+
+###
+GET {{BASE_URL}}/video/5/comments HTTP/1.1
+Authorization: eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJlbWFpbCI6ImF5dUBiZXRhLnR2In0.C1XiJUVLe-KEafRLY_o6Q3LCXPGqZxJ7WxuKn4vo79H2rK38Of1Jq769kLy8iLhOVIN_2UPx3NbcMyv_KfGyDw
+
+###
+GET {{BASE_URL}}/video/category/tech HTTP/1.1
+Authorization: eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJ1c2VybmFtZSI6ImF5dSJ9.zbr3VvKssiCMY91Qd6o6nMolfDdmGkqSHLfn589YDDIhoMzLVNwDraSmm_ad-UdHSFR38VfZRQXEiqMNZnb7vg
+
+###
+POST {{BASE_URL}}/video HTTP/1.1
+Authorization: eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJ1c2VybmFtZSI6ImFkbWluIn0.WoTKCtz0wyHdS3vFW0EbjcMaP_5WnCcW1X3gXSvW5lo18xo7BDcwCl_rThQCM92yyObHVXXfTvAk3XFtsH7XLg
+Content-Type: application/json
+
+{
+  "authorTitle": "SwiftUI Trivia Game with API Integration in under 30 minutes (Source Code Included)",
+  "authorDescription": "SwiftUI Trivia Game with API Integration in under 30 minutes (Source Code Included)",
+  "youtubeVideoId": "kv88jyhFwec",
+  "categorySlugs": [
+    "tech"
+  ]
+}
+
+###
+PUT  {{BASE_URL}}/video/1 HTTP/1.1
+Authorization: eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIiLCJ1c2VybmFtZSI6ImF5dSJ9.4u-5DYlr8xbsAMpVxpZizfVq0pUVDTlNThz8g44KpZiav5igmOo5BMAUno1JUZSYCfhjDMOix6qiAbb8CH8Abw
+Content-Type: application/json
+
+{
+  "authorTitle": "What is Xamarin? | Xamarin 101 [1 of 11]",
+  "authorDescription": "Ini direvisi",
+  "categorySlugs": [
+      "tech", "news"
+  ]
+}
+
+###
+DELETE {{BASE_URL}}/video/1 HTTP/1.1
+Authorization: eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIiLCJ1c2VybmFtZSI6ImFkbWluIn0.J0nJfthveOM1DMX6Sp3Izcvs5a5vFuhTNdNO0vWfZXOkNqQAce943Dh7iQYh3KRGs38-SkrK3QWf9CSMBLetKg
+
+###
+POST {{BASE_URL}}/video/search HTTP/1.1
+Authorization: eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIiLCJ1c2VybmFtZSI6ImF5dSJ9.4u-5DYlr8xbsAMpVxpZizfVq0pUVDTlNThz8g44KpZiav5igmOo5BMAUno1JUZSYCfhjDMOix6qiAbb8CH8Abw
+Content-Type: application/json
+
+{
+    "query" : "course"
+}
