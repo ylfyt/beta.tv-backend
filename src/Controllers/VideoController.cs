@@ -64,14 +64,22 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
         [AuthorizationCheckFilter]
         public async Task<ActionResult<ResponseDto<DataVideos>>> GetVideoByCategory(string category)
         {
-            var catVideos = await _context.Videos.Where(v => v.Categories.Contains(category)).ToListAsync();
+            var catVideos = await _context.Categories.Where(c => c.Slug == category).Include(c => c.Videos).ToListAsync();
+
+            if (catVideos.Count == 0)
+            {
+                return NotFound(new ResponseDto<DataVideos>
+                {
+                    message = "Category not found!"
+                });
+            }
 
             return Ok(new ResponseDto<DataVideos>
             {
                 success = true,
                 data = new DataVideos
                 {
-                    videos = catVideos
+                    videos = catVideos[0].Videos
                 }
             });
         }
@@ -118,7 +126,6 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
                     ChannelName = videoData.snippet.channelTitle,
                     Url = "https://www.youtube.com/embed/" + input.YoutubeVideoId,
                     Description = videoData.snippet.description,
-                    Categories = input.Categories,
                     AuthorDescription = input.AuthorDescription,
                     AuthorTitle = input.AuthorTitle,
                     AuthorName = userAuth!.Name,
@@ -184,7 +191,6 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
                 }
 
                 selectedVideo[0].AuthorTitle = input.AuthorTitle;
-                selectedVideo[0].Categories = input.Categories;
                 selectedVideo[0].AuthorDescription = input.AuthorDescription;
 
                 await _context.SaveChangesAsync();
