@@ -25,7 +25,7 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
         [AuthorizationCheckFilter]
         public async Task<ActionResult<ResponseDto<DataVideos>>> GetVideo()
         {
-            List<Video> videos = await _context.Videos.ToListAsync();
+            List<Video> videos = await _context.Videos.Include(v => v.Categories).ToListAsync();
             var response = new ResponseDto<DataVideos>
             {
                 success = true,
@@ -41,8 +41,8 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
         [AuthorizationCheckFilter]
         public async Task<ActionResult<ResponseDto<DataVideo>>> GetVideoById(int id)
         {
-            var idVideos = await _context.Videos.Where(v => v.Id == id).ToListAsync();
-            if (idVideos.Count != 1)
+            var video = await _context.Videos.Include(v => v.Categories).FirstOrDefaultAsync(v => v.Id == id);
+            if (video == null)
             {
                 return NotFound(new ResponseDto<DataVideo>
                 {
@@ -55,7 +55,7 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
                 success = true,
                 data = new DataVideo
                 {
-                    video = idVideos[0]
+                    video = video
                 }
             });
         }
@@ -90,7 +90,16 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
         {
             try
             {
+                if (input.AuthorDescription == "" || input.AuthorTitle == "")
+                {
+                    return BadRequest(new ResponseDto<DataVideo>
+                    {
+                        message = "Title or Description Cannot empty",
+                    });
+                }
+
                 var tempVideo = await _context.Videos.Where(v => v.YoutubeVideoId == input.YoutubeVideoId).ToListAsync();
+
                 if (tempVideo.Count != 0)
                 {
                     return BadRequest(
@@ -100,6 +109,21 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
                         }
                     );
                 }
+
+                var categories = new List<Category>();
+                foreach (var slug in input.CategorySlugs)
+                {
+                    var category = await _context.Categories.Where(c => c.Slug == slug).FirstOrDefaultAsync();
+                    if (category == null)
+                    {
+                        return BadRequest(new ResponseDto<DataVideo>
+                        {
+                            message = $"Category {slug} doesn't exist"
+                        });
+                    }
+                    categories.Add(category);
+                }
+
 
                 var youtubeResponse = await GetVideoUsingYoutubeAPI(input.YoutubeVideoId);
 
@@ -126,6 +150,7 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
                     ChannelName = videoData.snippet.channelTitle,
                     Url = "https://www.youtube.com/embed/" + input.YoutubeVideoId,
                     Description = videoData.snippet.description,
+                    Categories = categories,
                     AuthorDescription = input.AuthorDescription,
                     AuthorTitle = input.AuthorTitle,
                     AuthorName = userAuth!.Name,
@@ -179,19 +204,33 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
                     });
                 }
 
-                if (input.Categories.Count == 0)
+
+                if (input.AuthorDescription == "" || input.AuthorTitle == "")
                 {
-                    if (input.AuthorDescription == "" && input.AuthorTitle == "")
+                    return BadRequest(new ResponseDto<DataVideo>
+                    {
+                        message = "Title or Description Cannot empty",
+                    });
+                }
+
+                var categories = new List<Category>();
+                foreach (var slug in input.CategorySlugs)
+                {
+                    var category = await _context.Categories.Where(c => c.Slug == slug).FirstOrDefaultAsync();
+                    if (category == null)
                     {
                         return BadRequest(new ResponseDto<DataVideo>
                         {
-                            message = "Cannot empty",
+                            message = $"Category {slug} doesn't exist"
                         });
                     }
+                    categories.Add(category);
                 }
+
 
                 selectedVideo[0].AuthorTitle = input.AuthorTitle;
                 selectedVideo[0].AuthorDescription = input.AuthorDescription;
+                selectedVideo[0].Categories = categories;
 
                 await _context.SaveChangesAsync();
 
@@ -217,15 +256,15 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
         [AuthorizationCheckFilter(UserLevel.ADMIN)]
         public async Task<ActionResult<ResponseDto<DataVideo>>> DeleteVideo(int id)
         {
-            var deletedVideo = await _context.Videos.Where(v => v.Id == id).ToListAsync();
-            if (deletedVideo.Count != 1)
+            var video = await _context.Videos.FindAsync(id);
+            if (video == null)
             {
                 return NotFound(new ResponseDto<DataVideo>
                 {
                     message = "Video not found"
                 });
             }
-            _context.Videos.Remove(deletedVideo[0]);
+            _context.Videos.Remove(video);
             await _context.SaveChangesAsync();
 
             return Ok(new ResponseDto<DataVideo>
@@ -233,7 +272,7 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
                 success = true,
                 data = new DataVideo
                 {
-                    video = deletedVideo[0]
+                    video = video
                 }
             });
         }
@@ -255,7 +294,7 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
             List<Video> videos = new List<Video>();
             foreach (var word in arr)
             {
-                var newVideos = _context.Videos.AsEnumerable().Where(a => a.Title.ToLower().Contains(word)).Except(videos).ToList();
+                var newVideos = _context.Videos.Include(v => v.Categories).AsEnumerable().Where(a => a.Title.ToLower().Contains(word)).Except(videos).ToList();
                 videos.AddRange(newVideos);
             }
 
