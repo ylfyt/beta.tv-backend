@@ -347,5 +347,139 @@ namespace src.Controllers
                 Console.WriteLine("Error in SendEmail: " + ex.Message);
             }
         }
+
+        [HttpPost("changeProfile")]
+        [AuthorizationCheckFilter]
+        public async Task<ActionResult<ResponseDto<DataUser>>> changeProfile([FromBody] ChangeProfileDto input){
+            var selectedUser = await _context.User.Where(x => x.Username == input.OldUsername).ToListAsync();
+
+            if (selectedUser.Count != 1)
+            {
+                return BadRequest(new ResponseDto<DataUser>
+                {
+                    message = "Invalid account"
+                });
+            }
+
+            // check password
+            if (!VerifyPassword(input.Password, selectedUser[0]))
+            {
+                return BadRequest(new ResponseDto<DataUser>
+                {
+                    message = "Wrong password"
+                });
+            }
+
+            selectedUser[0].Name = input.Name;
+            selectedUser[0].Username = input.Username;
+            selectedUser[0].Email = input.Email;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new ResponseDto<DataUser>
+            {
+                success = true,
+                data = new DataUser
+                {
+                    user = selectedUser[0]
+                }
+            });
+        }
+
+        [HttpPost("changePass")]
+        [AuthorizationCheckFilter]
+        public async Task<ActionResult<ResponseDto<DataUser>>> changePassword([FromBody]ChangePassDto input){
+            var selectedUser = await _context.User.Where(x => x.Username == input.Username).ToListAsync();
+
+            if (selectedUser.Count != 1)
+            {
+                return BadRequest(new ResponseDto<DataUser>
+                {
+                    message = selectedUser.Count.ToString()
+                });
+            }
+
+            // check password
+            if (!VerifyPassword(input.OldPassword, selectedUser[0]))
+            {
+                return BadRequest(new ResponseDto<DataUser>
+                {
+                    message = "Wrong password"
+                });
+            }
+
+            // change password
+            string newpass = input.NewPassword;
+
+            // generate a 128-bit salt using a cryptographically strong random sequence of nonzero values
+            byte[] salt = new byte[128 / 8];
+            using (var rngCsp = new RNGCryptoServiceProvider())
+            {
+                rngCsp.GetNonZeroBytes(salt);
+            }
+
+            // derive a 256-bit subkey (use HMACSHA256 with 100,000 iterations)
+            string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: newpass,
+                salt: salt,
+                prf: KeyDerivationPrf.HMACSHA256,
+                iterationCount: 100000,
+                numBytesRequested: 256 / 8));
+
+            selectedUser[0].PasswordSalt = Convert.ToBase64String(salt);
+            selectedUser[0].Password = hashed;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new ResponseDto<DataUser>
+            {
+                success = true,
+                data = new DataUser
+                {
+                    user = selectedUser[0]
+                }
+            });
+        }
+
+        public static IWebHostEnvironment _environment;
+
+        [HttpPost("changeProfilePic")]
+        [AuthorizationCheckFilter]
+        public async Task<ActionResult<ResponseDto<string>>> changeProfilePic(IFormFile file){
+            
+            try{
+                var httpRequest = HttpContext.Current.Request;
+                var filename;
+                if (httpRequest.Files.Count > 0){
+                    foreach (string file in httpRequest.Files){
+                        var postedFile = httpRequest.Files[file];
+                        fileName = postedFile.FileName.Split('\\').LastOrDefault().Split('/').LastOrDefault();
+                        var filePath = HttpContext.Current.Server.MapPath("~/Uploads/"+fileName);
+                        postedFile.SaveAs(filePath);
+                    }
+
+                    return Ok(new ResponseDto<string>
+                    {
+                        success = true,
+                        data = "/Uploads/"+fileName
+                    });
+                }
+                else{
+                    return BadRequest(new ResponseDto<string>
+                    {
+                        message = "invalid file upload"
+                    });
+                }
+            }
+            catch(Exception e){
+                return BadRequest(new ResponseDto<DataUser>
+                {
+                    message = e.Message
+                });
+            }
+
+
+            
+        }
     }
 }

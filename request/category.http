@@ -5,11 +5,11 @@ Authorization: eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNob
 
 ###
 POST {{BASE_URL}}/category HTTP/1.1
-Authorization: eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJ1c2VybmFtZSI6ImFkbWluIn0.WoTKCtz0wyHdS3vFW0EbjcMaP_5WnCcW1X3gXSvW5lo18xo7BDcwCl_rThQCM92yyObHVXXfTvAk3XFtsH7XLg
+Authorization: eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjUiLCJ1c2VybmFtZSI6ImFkbWluIn0.yO19vyNp__gffxfDl4Tdq-d-e5xalYd9IyfAdfpAl8QS_wjSJgldsgaaNy6pU7SkGoN2nGlzOrvm7UKLVqXHSw
 Content-Type: application/json
 
 {
-    "label" : "Tech"
+    "label" : "tech"
 }
 
 ###

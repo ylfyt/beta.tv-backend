@@ -29,7 +29,18 @@ namespace src.Controllers
         [AuthorizationCheckFilter]
         public async Task<ActionResult<ResponseDto<DataVideo>>> GetBookmark()
         {
-            var bookmarks = await _context.Bookmarks.ToListAsync();
+            // add : get user's own bookmarks
+            var userAuth = HttpContext.Items["user"] as User;
+            var user = await _context.User.FindAsync(userAuth!.Id);
+            if (user == null)
+            {
+                return NotFound(new ResponseDto<DataVideos>
+                {
+                    message = "User Not Found"
+                });
+            }
+
+            var bookmarks = await _context.Bookmarks.Where(v => v.UserId == user.Id).ToListAsync();
             List<Video> videoList = new List<Video>();
             foreach (var bookmark in bookmarks)
             {
@@ -49,6 +60,42 @@ namespace src.Controllers
                 }
             };
             return Ok(response);
+        }
+
+        [HttpGet("isBookmarked")]
+        [AuthorizationCheckFilter]
+        public async Task<ActionResult<ResponseDto<bool>>>GetIsBookmarked(int id){
+
+            try{
+                var userAuth = HttpContext.Items["user"] as User;
+                var user = await _context.User.FindAsync(userAuth!.Id);
+
+                var targetBookmark = await _context.Bookmarks.Where(v => v.Id == id && v.UserId == user.Id).ToListAsync();
+                if (targetBookmark.Count > 0){
+                    var response = new ResponseDto<bool>
+                    {
+                        success = true,
+                        data = true
+                    };
+                    return Ok(response);
+                }
+                else{
+                    var response = new ResponseDto<bool>
+                    {
+                        success = true,
+                        data = false
+                    };
+                    return Ok(response);
+                }
+            }
+            catch (System.Exception)
+            {
+                return BadRequest(new ResponseDto<DataBookmark>
+                {
+                    message = "Failed to add bookmark"
+                });
+            }
+            
         }
 
         [HttpGet("{id}")]
@@ -171,5 +218,7 @@ namespace src.Controllers
                 }
             });
         }
+
+
     }
 }
