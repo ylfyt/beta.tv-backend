@@ -1,9 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Mvc;
 using src.Data;
 using src.Models;
 using src.Dtos;
@@ -30,26 +25,17 @@ namespace src.Controllers
         public async Task<ActionResult<ResponseDto<DataVideo>>> GetBookmark()
         {
             // add : get user's own bookmarks
-            var userAuth = HttpContext.Items["user"] as User;
-            var user = await _context.User.FindAsync(userAuth!.Id);
-            if (user == null)
-            {
-                return NotFound(new ResponseDto<DataVideos>
-                {
-                    message = "User Not Found"
-                });
-            }
+            var user = HttpContext.Items["user"] as User;
 
-            var bookmarks = await _context.Bookmarks.Where(v => v.UserId == user.Id).ToListAsync();
+            var bookmarks = await _context.Bookmarks.Where(v => v.UserId == user!.Id).ToListAsync();
             List<Video> videoList = new List<Video>();
             foreach (var bookmark in bookmarks)
             {
-                var video = await _context.Videos.Where(v => v.Id == bookmark.VideoId).ToListAsync();
-                if (video.Count != 1)
+                var video = await _context.Videos.Where(v => v.Id == bookmark.VideoId).FirstOrDefaultAsync();
+                if (video != null)
                 {
-                    continue;
+                    videoList.Add(video);
                 }
-                videoList.Add(video[0]);
             }
             var response = new ResponseDto<DataVideos>
             {
@@ -62,28 +48,31 @@ namespace src.Controllers
             return Ok(response);
         }
 
-        [HttpGet("isBookmarked")]
+        [HttpGet("check/{videoId}")]
         [AuthorizationCheckFilter]
-        public async Task<ActionResult<ResponseDto<bool>>>GetIsBookmarked(int id){
-
-            try{
+        public async Task<ActionResult<ResponseDto<DataBookmark>>> CheckBookmark(int videoId)
+        {
+            try
+            {
                 var userAuth = HttpContext.Items["user"] as User;
-                var user = await _context.User.FindAsync(userAuth!.Id);
-
-                var targetBookmark = await _context.Bookmarks.Where(v => v.Id == id && v.UserId == user.Id).ToListAsync();
-                if (targetBookmark.Count > 0){
-                    var response = new ResponseDto<bool>
+                var targetBookmark = await _context.Bookmarks.Where(v => v.VideoId == videoId && v.UserId == userAuth!.Id).FirstOrDefaultAsync();
+                if (targetBookmark != null)
+                {
+                    var response = new ResponseDto<DataBookmark>
                     {
                         success = true,
-                        data = true
+                        data = new DataBookmark
+                        {
+                            bookmark = targetBookmark
+                        }
                     };
                     return Ok(response);
                 }
-                else{
-                    var response = new ResponseDto<bool>
+                else
+                {
+                    var response = new ResponseDto<DataBookmark>
                     {
                         success = true,
-                        data = false
                     };
                     return Ok(response);
                 }
@@ -92,26 +81,26 @@ namespace src.Controllers
             {
                 return BadRequest(new ResponseDto<DataBookmark>
                 {
-                    message = "Failed to add bookmark"
+                    message = "Failed to get bookmark"
                 });
             }
-            
+
         }
 
         [HttpGet("{id}")]
         [AuthorizationCheckFilter]
         public async Task<ActionResult<ResponseDto<DataVideo>>> GetBookmarkById(int id)
         {
-            var targetBookmark = await _context.Bookmarks.Where(v => v.Id == id).ToListAsync();
-            if (targetBookmark.Count != 1)
+            var targetBookmark = await _context.Bookmarks.Where(b => b.Id == id).FirstOrDefaultAsync();
+            if (targetBookmark == null)
             {
                 return NotFound(new ResponseDto<DataBookmark>
                 {
                     message = "Bookmark not found"
                 });
             }
-            var video = await _context.Videos.Where(v => v.Id == targetBookmark[0].VideoId).ToListAsync();
-            if (video.Count != 1)
+            var video = await _context.Videos.Where(v => v.Id == targetBookmark.VideoId).FirstOrDefaultAsync();
+            if (video == null)
             {
                 return NotFound(new ResponseDto<DataVideo>
                 {
@@ -123,7 +112,7 @@ namespace src.Controllers
                 success = true,
                 data = new DataVideo
                 {
-                    video = video[0]
+                    video = video
                 }
             };
             return Ok(response);
@@ -219,6 +208,33 @@ namespace src.Controllers
             });
         }
 
+        [HttpDelete("video/{videoId}")]
+        [AuthorizationCheckFilter]
+        public async Task<ActionResult<ResponseDto<DataBookmark>>> DeleteBookmarkByVideoId(int videoId)
+        {
+            var user = HttpContext.Items["user"] as User;
+            var deletedBookmark = await _context.Bookmarks.Where(b => b.VideoId == videoId && b.UserId == user!.Id).FirstOrDefaultAsync();
+
+            if (deletedBookmark == null)
+            {
+                return NotFound(new ResponseDto<DataBookmark>
+                {
+                    message = "Bookmark not found"
+                });
+            }
+
+            _context.Bookmarks.Remove(deletedBookmark);
+            await _context.SaveChangesAsync();
+
+            return Ok(new ResponseDto<DataBookmark>
+            {
+                success = true,
+                data = new DataBookmark
+                {
+                    bookmark = deletedBookmark
+                }
+            });
+        }
 
     }
 }

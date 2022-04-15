@@ -350,7 +350,8 @@ namespace src.Controllers
 
         [HttpPost("changeProfile")]
         [AuthorizationCheckFilter]
-        public async Task<ActionResult<ResponseDto<DataUser>>> changeProfile([FromBody] ChangeProfileDto input){
+        public async Task<ActionResult<ResponseDto<DataUser>>> changeProfile([FromBody] ChangeProfileDto input)
+        {
             var selectedUser = await _context.User.Where(x => x.Username == input.OldUsername).ToListAsync();
 
             if (selectedUser.Count != 1)
@@ -388,7 +389,8 @@ namespace src.Controllers
 
         [HttpPost("changePass")]
         [AuthorizationCheckFilter]
-        public async Task<ActionResult<ResponseDto<DataUser>>> changePassword([FromBody]ChangePassDto input){
+        public async Task<ActionResult<ResponseDto<DataUser>>> changePassword([FromBody] ChangePassDto input)
+        {
             var selectedUser = await _context.User.Where(x => x.Username == input.Username).ToListAsync();
 
             if (selectedUser.Count != 1)
@@ -440,7 +442,7 @@ namespace src.Controllers
                 }
             });
         }
-
+        /*
         public static IWebHostEnvironment _environment;
 
         [HttpPost("changeProfilePic")]
@@ -481,5 +483,6 @@ namespace src.Controllers
 
             
         }
+        */
     }
 }
