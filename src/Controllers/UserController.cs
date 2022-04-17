@@ -484,5 +484,33 @@ namespace src.Controllers
             
         }
         */
+
+        [HttpPost("changeProfilePic")]
+        [AuthorizationCheckFilter]
+        public async Task<ActionResult<ResponseDto<DataUser>>> changeProfilePhoto([FromBody] ChangeProfPhotoDto input)
+        {
+            var selectedUser = await _context.User.Where(x => x.Username == input.Username).ToListAsync();
+
+            if (selectedUser.Count != 1)
+            {
+                return BadRequest(new ResponseDto<DataUser>
+                {
+                    message = "Invalid account"
+                });
+            }
+
+            selectedUser[0].PhotoURL = input.PhotoURL;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new ResponseDto<DataUser>
+            {
+                success = true,
+                data = new DataUser
+                {
+                    user = selectedUser[0]
+                }
+            });
+        }
     }
 }

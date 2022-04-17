@@ -19,5 +19,6 @@ namespace src.Models
         public string PasswordSalt { get; set; } = string.Empty;
         [JsonIgnore]
         public string Password { get; set; } = string.Empty;
+        public string PhotoURL{get; set;} = string.Empty;
     }
 }
