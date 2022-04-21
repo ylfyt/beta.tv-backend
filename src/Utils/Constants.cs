@@ -5,4 +5,7 @@ public static class Constants
     public static string connectionString { get; } = $"Host={Constants.DB_HOST};Username={Credentials.DB_USERNAME};Password={Credentials.DB_PASSWORD};Database={Constants.DB_NAME}";
 
     public static string JWT_SECRET_KEY { get; } = "secret key dkasjlkdasjmkldasmkdamslkdmaskmd";
+
+    public const string YOUTUBE_CHANNEL_ID = "UCSVFeUogGX4M_N4l3zjrhFQ";
+
 }

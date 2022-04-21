@@ -78,11 +78,6 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
         {
             try
             {
-                if (input.AuthorDescription == "" || input.AuthorTitle == "")
-                {
-                    return BadRequest(_responseGetterSingle.Error("Title or Description Cannot empty"));
-                }
-
                 var tempVideo = await _context.Videos.Where(v => v.YoutubeVideoId == input.YoutubeVideoId).ToListAsync();
 
                 if (tempVideo.Count != 0)
@@ -107,6 +102,11 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
                 if (youtubeResponse == null || youtubeResponse.pageInfo?.resultsPerPage == 0)
                 {
                     return BadRequest(_responseGetterSingle.Error("Failed to upload video"));
+                }
+
+                if (youtubeResponse?.items[0]?.snippet?.channelId != Constants.YOUTUBE_CHANNEL_ID)
+                {
+                    return BadRequest(_responseGetterSingle.Error("The video is not from beta.tv youtube channel"));
                 }
 
                 var videoData = youtubeResponse.items[0];
