@@ -8,7 +8,7 @@ namespace src.Models
         public int Id { get; set; }
         public int VideoId { get; set; }
         public int UserId { get; set; }
-        public User User { get; set; }
+        public User? User { get; set; }
         [JsonIgnore]
         public List<CommentLike> CommentLikes { get; set; } = new List<CommentLike>();
         [NotMapped]

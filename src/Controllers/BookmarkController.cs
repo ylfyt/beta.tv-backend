@@ -135,7 +135,7 @@ namespace src.Controllers
 
                 var user = HttpContext.Items["user"] as User;
 
-                var bookmarkExist = await _context.Bookmarks.Where(b => b.UserId == user.Id && b.VideoId == input.VideoId).FirstOrDefaultAsync();
+                var bookmarkExist = await _context.Bookmarks.Where(b => b.UserId == user!.Id && b.VideoId == input.VideoId).FirstOrDefaultAsync();
 
                 if (bookmarkExist != null)
                 {

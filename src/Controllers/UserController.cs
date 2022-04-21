@@ -104,6 +104,50 @@ namespace src.Controllers
             });
         }
 
+        [HttpPost("admin/login")]
+        public async Task<ActionResult<ResponseDto<DataUser>>> loginAdmin([FromBody] LoginInputDto input)
+        {
+            var users = await _context.User.Where(x => x.Username == input.Username).ToListAsync();
+
+            if (users.Count != 1)
+            {
+                return BadRequest(new ResponseDto<DataUser>
+                {
+                    message = "Bad request"
+                });
+            }
+
+            if (users[0].Level != UserLevel.ADMIN)
+            {
+                return Unauthorized(new ResponseDto<DataUser>
+                {
+                    message = "Forbidden"
+                });
+            }
+
+            if (!VerifyPassword(input.Password, users[0]))
+            {
+                return BadRequest(new ResponseDto<DataUser>
+                {
+                    message = "Bad request"
+                });
+            }
+
+            string token = await _tm.CreateToken(users[0]);
+
+            Response.Headers.Add("Authorization", token);
+
+            return Ok(new ResponseDto<DataUser>
+            {
+                success = true,
+                data = new DataUser
+                {
+                    user = users[0],
+                    token = token
+                }
+            });
+        }
+
         private bool VerifyPassword(string password, User user)
         {
             // derive a 256-bit subkey (use HMACSHA256 with 100,000 iterations)
@@ -196,7 +240,7 @@ namespace src.Controllers
 
             string eToken = await _etm.CreateToken(insert);
 
-            BuildEmailTemplate(insert.Id, insert.Email, eToken);
+            SendEmailConfirmation(insert.Id, insert.Email, eToken);
 
             return Ok(new ResponseDto<DataUser>
             {
@@ -212,15 +256,15 @@ namespace src.Controllers
         [HttpPost("confirm/{eToken}")]
         public async Task<ActionResult<ResponseDto<DataUser>>> Confirm(string eToken)
         {
-            var userLog = await _context.EmailTokenLogs.Where(x => x.Token == eToken).ToListAsync();
-            if (userLog.Count != 1)
+            var log = await _context.EmailTokenLogs.Where(x => x.Token == eToken && x.Status == true).FirstOrDefaultAsync();
+            if (log == null)
             {
                 return NotFound(new ResponseDto<DataUser>
                 {
                     message = "Token Not Found"
                 });
             }
-            var user = await _context.User.FindAsync(userLog[0].UserId);
+            var user = await _context.User.FindAsync(log.UserId);
             if (user == null)
             {
                 return NotFound(new ResponseDto<DataUser>
@@ -229,6 +273,7 @@ namespace src.Controllers
                 });
             }
             user.IsConfirmed = true;
+            log.Status = false;
             await _context.SaveChangesAsync();
 
             return Ok(new ResponseDto<DataUser>
@@ -266,70 +311,22 @@ namespace src.Controllers
             });
         }
 
-        /*public System.Web.Mvc.ActionResult Confirm(int id)
+        private async void SendEmailConfirmation(int id, string email, string eToken)
         {
-            ViewBag.Id = id;
-            var user = _context.User.Where(x => x.Id == id).FirstOrDefaultAsync();
-            user.IsConfirmed = true;
-            _context.SaveChangesAsync();
-            return View();
-        }*/
-
-        /*public Microsoft.AspNetCore.Mvc.JsonResult RegisterConfirm(int id)
-        {
-            var user = _context.User.Where(x => x.Id == id).FirstOrDefaultAsync();
-            user.IsConfirmed = true;
-            _context.SaveChangesAsync();
-            var msg = "Your Email is verified!";
-            return System.Web.Mvc.JsonResult(new { });
-        }*/
-
-        private async void BuildEmailTemplate(int id, string email, string eToken)
-        {
-            string body = "<html><head></head><body><div><a href=\"@ViewBag.ConfirmationLink\">Here</a></div></body></html>";
-            try
-            {
-                body = System.IO.File.ReadAllText("../if3250_2022_buletin_backend/src/EmailTemplate/Text.cshtml");
-            }
-            catch
-            {
-            }
-            var regInfo = email;
             var url = "http://localhost:3000/" + "confirm/" + eToken;
-            body = body.Replace("@ViewBag.ConfirmationLink", url);
-            body = body.ToString();
-            BuildEmailTemplate("Your Account is Successfully Created", body, regInfo);
-        }
+            string body = $"<h2>Thank you for joining us 😊</h2> <a href='{url}'>Click here to confirm your email.</a>";
+            string subject = "Your Account is Successfully Created";
 
-        private void BuildEmailTemplate(string subjectText, string bodyText, string sendTo)
-        {
-            string from, to, bcc, cc, subject, body;
-            from = "ignatiusdavidpartogi@gmail.com";
-            to = sendTo.Trim();
-            bcc = "";
-            cc = "";
-            subject = subjectText;
-            StringBuilder sb = new StringBuilder();
-            sb.Append(bodyText);
-            body = sb.ToString();
-            MailMessage mail = new MailMessage();
-            mail.From = new MailAddress(from);
-            mail.To.Add(new MailAddress(to));
-            if (!string.IsNullOrEmpty(bcc))
-            {
-                mail.Bcc.Add(new MailAddress(bcc));
-            }
-            if (!string.IsNullOrEmpty(cc))
-            {
-                mail.CC.Add(new MailAddress(cc));
-            }
+            string from = Credentials.SENDER_EMAIL;
+
+            MailMessage mail = new MailMessage(from, email);
             mail.Subject = subject;
             mail.Body = body;
             mail.IsBodyHtml = true;
-            SendEmail(mail);
+            await SendEmail(mail);
         }
 
-        public static void SendEmail(MailMessage mail)
+        private async Task SendEmail(MailMessage mail)
         {
             SmtpClient client = new SmtpClient();
             client.Host = "smtp.gmail.com";
@@ -340,7 +337,7 @@ namespace src.Controllers
             client.Credentials = new System.Net.NetworkCredential(Credentials.SENDER_EMAIL, Credentials.SENDER_PASS);
             try
             {
-                client.Send(mail);
+                await client.SendMailAsync(mail);
             }
             catch (SmtpException ex)
             {
@@ -448,7 +445,7 @@ namespace src.Controllers
         [HttpPost("changeProfilePic")]
         [AuthorizationCheckFilter]
         public async Task<ActionResult<ResponseDto<string>>> changeProfilePic(IFormFile file){
-            
+
             try{
                 var httpRequest = HttpContext.Current.Request;
                 var filename;
@@ -481,7 +478,7 @@ namespace src.Controllers
             }
 
 
-            
+
         }
         */
 

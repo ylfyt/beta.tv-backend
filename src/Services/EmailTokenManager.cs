@@ -17,39 +17,35 @@ namespace src.Interfaces
         }
         public async Task<string> CreateToken(User user)
         {
-            var logs = await _context.EmailTokenLogs.Where(x => x.UserId == user.Id).ToListAsync();
-            EmailTokenLog log;
+            var log = await _context.EmailTokenLogs.Where(x => x.UserId == user.Id && x.Status == true).FirstOrDefaultAsync();
 
-            if (logs.Count != 1)
+            if (log != null)
             {
-                List<Claim> claims = new List<Claim>{
+                return log.Token;
+            }
+
+            List<Claim> claims = new List<Claim>{
                     new Claim("id", user.Id.ToString()),
                     new Claim("email", user.Email)
                 };
 
-                var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(Constants.JWT_SECRET_KEY));
-                var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-                var jwt = new JwtSecurityToken(
-                    claims: claims,
-                    signingCredentials: cred
-                );
+            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(Constants.JWT_SECRET_KEY));
+            var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+            var jwt = new JwtSecurityToken(
+                claims: claims,
+                signingCredentials: cred
+            );
 
-                var token = new JwtSecurityTokenHandler().WriteToken(jwt);
+            var token = new JwtSecurityTokenHandler().WriteToken(jwt);
 
-                log = new EmailTokenLog
-                {
-                    UserId = user.Id,
-                    Token = token,
-                    Status = true,
-                };
-                await _context.EmailTokenLogs.AddAsync(log);
-            }
-            else
+            log = new EmailTokenLog
             {
-                log = logs[0];
-                if (!log.Status)
-                    log.Status = true;
-            }
+                UserId = user.Id,
+                Token = token,
+                Status = true,
+            };
+
+            await _context.EmailTokenLogs.AddAsync(log);
             await _context.SaveChangesAsync();
 
             return log.Token;
