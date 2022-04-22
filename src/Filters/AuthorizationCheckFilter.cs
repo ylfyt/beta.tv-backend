@@ -40,6 +40,11 @@ namespace src.Filters
             {
                 string token = context.HttpContext.Request.Headers.First(x => x.Key == "Authorization").Value;
                 User user = await _tm.VerifyToken(token);
+                if (!user.IsConfirmed)
+                {
+                    SendUnauthorized(context, "not-confirmed");
+                    return;
+                }
                 if (!IsQualified(user))
                 {
                     SendUnauthorized(context);
@@ -64,14 +69,14 @@ namespace src.Filters
             return _filteredUserLevel.Contains(user.Level) ? true : false;
         }
 
-        public void SendUnauthorized(AuthorizationFilterContext context)
+        public void SendUnauthorized(AuthorizationFilterContext context, string? msg = null)
         {
             context.HttpContext.Response.StatusCode = 401;
             object? data = null;
             context.Result = new JsonResult(new
             {
                 success = false,
-                message = "Unauthorized",
+                message = msg ?? "Unauthorized",
                 data
             });
         }
