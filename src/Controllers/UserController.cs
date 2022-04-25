@@ -341,7 +341,7 @@ namespace src.Controllers
             string body = $"<h2>Thank you for joining us 😊</h2> <a href='{url}'>Click here to confirm your email.</a>";
             string subject = "Your Account is Successfully Created";
 
-            string from = Credentials.SENDER_EMAIL;
+            string from = EmailCredential.Email;
 
             MailMessage mail = new MailMessage(from, email);
             mail.Subject = subject;
@@ -358,7 +358,7 @@ namespace src.Controllers
             client.EnableSsl = true;
             client.UseDefaultCredentials = false;
             //client.DeliveryMethod = SmtpDeliveryMethod.Network;
-            client.Credentials = new System.Net.NetworkCredential(Credentials.SENDER_EMAIL, Credentials.SENDER_PASS);
+            client.Credentials = new System.Net.NetworkCredential(EmailCredential.Email, EmailCredential.Password);
             try
             {
                 await client.SendMailAsync(mail);

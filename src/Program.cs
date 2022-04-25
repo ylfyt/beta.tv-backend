@@ -44,6 +44,12 @@ builder.Services.AddScoped<IResponseGetter<DataComments>, ResponseGetter<DataCom
 builder.Services.AddScoped<IResponseGetter<DataCommentLike>, ResponseGetter<DataCommentLike>>();
 builder.Services.AddScoped<IResponseGetter<DataCommentLikes>, ResponseGetter<DataCommentLikes>>();
 
+var betaEmail = Environment.GetEnvironmentVariable("beta-email");
+var betaPassword = Environment.GetEnvironmentVariable("beta-password");
+
+EmailCredential.Email = betaEmail ?? "";
+EmailCredential.Password = betaPassword ?? "";
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
