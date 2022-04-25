@@ -8,26 +8,37 @@ using src.Dtos.video;
 using src.Interfaces;
 using src.Services;
 
-var builder = WebApplication.CreateBuilder(args);
+// Loading .env file
+var root = Directory.GetCurrentDirectory();
+var dotenv = Path.Combine(root, ".env");
+DotEnv.Load(dotenv);
+
+var connectionString = Environment.GetEnvironmentVariable("DB_CONNECT");
+var betaPassword = Environment.GetEnvironmentVariable("BETA_PASSWORD");
+var betaEmail = Environment.GetEnvironmentVariable("BETA_EMAIL");
+var adminPageUrl = Environment.GetEnvironmentVariable("ADMIN_PAGE_URL");
+
+if (connectionString == null || betaPassword == null || betaEmail == null || adminPageUrl == null){
+  throw new Exception("Some Environment Variabel is not exist");
+}
 
 Console.WriteLine("===============================");
-var connectionString = Environment.GetEnvironmentVariable("connection-string");
-if (connectionString == null)
-{
-    Console.WriteLine("Connection string in environment is not found. Get from constant");
-    connectionString = Constants.connectionString;
-}
-else
-{
-    Console.WriteLine("Get connection string from environment");
-}
-Console.WriteLine(connectionString);
+Console.WriteLine($"DB_CONNECT={connectionString}");
+Console.WriteLine($"BETA_EMAIL={betaEmail}");
+Console.WriteLine($"BETA_PASSWORD={betaPassword}");
+Console.WriteLine($"ADMIN_PAGE_URL={adminPageUrl}");
 Console.WriteLine("===============================");
+
+EmailCredential.Email = betaEmail;
+EmailCredential.Password = betaPassword;
+ServerInfo.ADMIN_WEB_URL = adminPageUrl;
+
+var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDbContext<DataContext>(options =>
 {
-    options.UseNpgsql(connectionString);
+    options.UseNpgsql(connectionString!);
 });
 
 // TODO: Pilih yang terbaik
@@ -43,15 +54,6 @@ builder.Services.AddScoped<IResponseGetter<DataComment>, ResponseGetter<DataComm
 builder.Services.AddScoped<IResponseGetter<DataComments>, ResponseGetter<DataComments>>();
 builder.Services.AddScoped<IResponseGetter<DataCommentLike>, ResponseGetter<DataCommentLike>>();
 builder.Services.AddScoped<IResponseGetter<DataCommentLikes>, ResponseGetter<DataCommentLikes>>();
-
-var betaEmail = Environment.GetEnvironmentVariable("beta-email");
-var betaPassword = Environment.GetEnvironmentVariable("beta-password");
-
-EmailCredential.Email = betaEmail ?? "";
-EmailCredential.Password = betaPassword ?? "";
-
-var adminUrl = Environment.GetEnvironmentVariable("admin-web-url");
-ServerInfo.ADMIN_WEB_URL = adminUrl ?? "http://localhost:3000";
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
