@@ -52,6 +52,30 @@ namespace src.Controllers
             });
         }
 
+        [HttpGet("admin/me")]
+        [AuthorizationCheckFilter(UserLevel.ADMIN)]
+        public async Task<ActionResult<ResponseDto<DataUser>>> meAdmin()
+        {
+            var userAuth = HttpContext.Items["user"] as User;
+            var user = await _context.User.FindAsync(userAuth!.Id);
+            if (user == null)
+            {
+                return NotFound(new ResponseDto<DataUser>
+                {
+                    message = "User Not Found"
+                });
+            }
+
+            return Ok(new ResponseDto<DataUser>
+            {
+                success = true,
+                data = new DataUser
+                {
+                    user = userAuth!
+                }
+            });
+        }
+
         [HttpGet]
         [AuthorizationCheckFilter(UserLevel.ADMIN)]
         public async Task<ActionResult<ResponseDto<DataUser>>> GetAllUser()
