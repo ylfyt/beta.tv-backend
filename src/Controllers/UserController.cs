@@ -337,7 +337,7 @@ namespace src.Controllers
 
         private async void SendEmailConfirmation(int id, string email, string eToken)
         {
-            var url = "http://localhost:3000/" + "confirm/" + eToken;
+            var url = ServerInfo.ADMIN_WEB_URL + "/confirm/" + eToken;
             string body = $"<h2>Thank you for joining us 😊</h2> <a href='{url}'>Click here to confirm your email.</a>";
             string subject = "Your Account is Successfully Created";
 

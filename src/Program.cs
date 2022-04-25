@@ -50,6 +50,9 @@ var betaPassword = Environment.GetEnvironmentVariable("beta-password");
 EmailCredential.Email = betaEmail ?? "";
 EmailCredential.Password = betaPassword ?? "";
 
+var adminUrl = Environment.GetEnvironmentVariable("admin-web-url");
+ServerInfo.ADMIN_WEB_URL = adminUrl ?? "http://localhost:3000";
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
