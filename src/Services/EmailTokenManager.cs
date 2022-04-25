@@ -29,7 +29,7 @@ namespace src.Interfaces
                     new Claim("email", user.Email)
                 };
 
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(Constants.JWT_SECRET_KEY));
+            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(ServerInfo.JWT_SECRET));
             var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
             var jwt = new JwtSecurityToken(
                 claims: claims,
@@ -63,7 +63,7 @@ namespace src.Interfaces
                 new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(Constants.JWT_SECRET_KEY)),
+                    IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(ServerInfo.JWT_SECRET)),
                     ValidateLifetime = false,
                     ValidateAudience = false,
                     ValidateIssuer = false,

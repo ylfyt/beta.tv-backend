@@ -14,24 +14,27 @@ var dotenv = Path.Combine(root, ".env");
 DotEnv.Load(dotenv);
 
 var connectionString = Environment.GetEnvironmentVariable("DB_CONNECT");
-var betaPassword = Environment.GetEnvironmentVariable("BETA_PASSWORD");
-var betaEmail = Environment.GetEnvironmentVariable("BETA_EMAIL");
+var betaPassword = Environment.GetEnvironmentVariable("BETA_EMAIL_PASSWORD");
+var betaEmail = Environment.GetEnvironmentVariable("BETA_EMAIL_ADDRESS");
 var adminPageUrl = Environment.GetEnvironmentVariable("ADMIN_PAGE_URL");
+var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET");
 
-if (connectionString == null || betaPassword == null || betaEmail == null || adminPageUrl == null){
+if (connectionString == null || betaPassword == null || betaEmail == null || adminPageUrl == null || jwtSecret == null){
   throw new Exception("Some Environment Variabel is not exist");
 }
 
 Console.WriteLine("===============================");
 Console.WriteLine($"DB_CONNECT={connectionString}");
-Console.WriteLine($"BETA_EMAIL={betaEmail}");
-Console.WriteLine($"BETA_PASSWORD={betaPassword}");
+Console.WriteLine($"BETA_EMAIL_ADDRESS={betaEmail}");
+Console.WriteLine($"BETA_EMAIL_PASSWORD={betaPassword}");
 Console.WriteLine($"ADMIN_PAGE_URL={adminPageUrl}");
+Console.WriteLine($"JWT_SECRET={jwtSecret}");
 Console.WriteLine("===============================");
 
-EmailCredential.Email = betaEmail;
-EmailCredential.Password = betaPassword;
-ServerInfo.ADMIN_WEB_URL = adminPageUrl;
+ServerInfo.EMAIL_ADDRESS = betaEmail;
+ServerInfo.EMAIL_PASSWORD = betaPassword;
+ServerInfo.ADMIN_PAGE_URL = adminPageUrl;
+ServerInfo.JWT_SECRET = jwtSecret;
 
 var builder = WebApplication.CreateBuilder(args);
 

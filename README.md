@@ -32,17 +32,8 @@ or
 
 ## Langkah - Langkah Menjalankan Server
 
-1. Buat File "Credentials.cs" dan class di directory **src/**
-
-```
-class Credentials
-{
-    // DB Config
-    
-}
-```
-
-2. Ganti database username dan password (ganti <BD_USERNAME> dan <DB_PASSWORD>)
+1. Duplicate file **".env.example"** pada directory yang sama, lalu hilangkan kata **".example"** pada file hasil duplicate, sehingga nama file menjadi **".env"**
+2. Ubah nilai credential pada file **".env"** tersebut
 3. Mengupdate project (download package, jika menggunakan visual studio harusnya otomatis)
 
 ```

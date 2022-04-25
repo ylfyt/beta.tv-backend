@@ -337,11 +337,11 @@ namespace src.Controllers
 
         private async void SendEmailConfirmation(int id, string email, string eToken)
         {
-            var url = ServerInfo.ADMIN_WEB_URL + "/confirm/" + eToken;
+            var url = ServerInfo.ADMIN_PAGE_URL + "/confirm/" + eToken;
             string body = $"<h2>Thank you for joining us 😊</h2> <a href='{url}'>Click here to confirm your email.</a>";
             string subject = "Your Account is Successfully Created";
 
-            string from = EmailCredential.Email;
+            string from = ServerInfo.EMAIL_ADDRESS;
 
             MailMessage mail = new MailMessage(from, email);
             mail.Subject = subject;
@@ -358,7 +358,7 @@ namespace src.Controllers
             client.EnableSsl = true;
             client.UseDefaultCredentials = false;
             //client.DeliveryMethod = SmtpDeliveryMethod.Network;
-            client.Credentials = new System.Net.NetworkCredential(EmailCredential.Email, EmailCredential.Password);
+            client.Credentials = new System.Net.NetworkCredential(ServerInfo.EMAIL_ADDRESS, ServerInfo.EMAIL_PASSWORD);
             try
             {
                 await client.SendMailAsync(mail);
