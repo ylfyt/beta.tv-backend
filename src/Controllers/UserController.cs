@@ -78,7 +78,7 @@ namespace src.Controllers
 
         [HttpGet]
         [AuthorizationCheckFilter(UserLevel.ADMIN)]
-        public async Task<ActionResult<ResponseDto<DataUser>>> GetAllUser()
+        public async Task<ActionResult<ResponseDto<DataUsers>>> GetAllUser()
         {
             List<User> allUser = await _context.User.ToListAsync();
             var response = new ResponseDto<DataUsers>
