@@ -229,7 +229,19 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
             List<Video> videos = new List<Video>();
             foreach (var word in arr)
             {
-                var newVideos = _context.Videos.Include(v => v.Categories).AsEnumerable().Where(a => a.Title.ToLower().Contains(word)).Except(videos).ToList();
+                var newVideos = 
+                  _context.Videos
+                  .Include(v => v.Categories)
+                  .AsEnumerable()
+                  .Where(
+                    a => 
+                      a.Title.ToLower().Contains(word) || 
+                      a.Description.ToLower().Contains(word) || 
+                      a.AuthorTitle.ToLower().Contains(word) || 
+                      a.AuthorDescription.ToLower().Contains(word)
+                  )
+                  .Except(videos)
+                  .ToList();
                 videos.AddRange(newVideos);
             }
 
