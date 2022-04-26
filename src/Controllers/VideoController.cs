@@ -243,7 +243,7 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
         {
             string YOUTUBE_API_BASE_URL = "https://www.googleapis.com/youtube/v3";
             string YOUTUBE_API_VIDEOS_ENDPOINT = "videos";
-            string API_KEY = "AIzaSyDUJmNHHT7ruc3Tt4u8ITp0yzFkFDN_Fbg";
+            string API_KEY = ServerInfo.GOOGLE_API_KEY;
             string PART = "snippet";
 
             string requestUri = $"{YOUTUBE_API_BASE_URL}/{YOUTUBE_API_VIDEOS_ENDPOINT}?key={API_KEY}&id={id}&part={PART}";

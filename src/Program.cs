@@ -18,8 +18,16 @@ var betaPassword = Environment.GetEnvironmentVariable("BETA_EMAIL_PASSWORD");
 var betaEmail = Environment.GetEnvironmentVariable("BETA_EMAIL_ADDRESS");
 var adminPageUrl = Environment.GetEnvironmentVariable("ADMIN_PAGE_URL");
 var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET");
+var googleAPIKey = Environment.GetEnvironmentVariable("GOOGLE_API_KEY");
 
-if (connectionString == null || betaPassword == null || betaEmail == null || adminPageUrl == null || jwtSecret == null){
+if (
+  connectionString == null || 
+  betaPassword == null || 
+  betaEmail == null || 
+  adminPageUrl == null || 
+  jwtSecret == null || 
+  googleAPIKey == null
+){
   throw new Exception("Some Environment Variabel is not exist");
 }
 
@@ -29,12 +37,14 @@ Console.WriteLine($"BETA_EMAIL_ADDRESS={betaEmail}");
 Console.WriteLine($"BETA_EMAIL_PASSWORD={betaPassword}");
 Console.WriteLine($"ADMIN_PAGE_URL={adminPageUrl}");
 Console.WriteLine($"JWT_SECRET={jwtSecret}");
+Console.WriteLine($"GOOGLE_API_KEY={googleAPIKey}");
 Console.WriteLine("===============================");
 
 ServerInfo.EMAIL_ADDRESS = betaEmail;
 ServerInfo.EMAIL_PASSWORD = betaPassword;
 ServerInfo.ADMIN_PAGE_URL = adminPageUrl;
 ServerInfo.JWT_SECRET = jwtSecret;
+ServerInfo.GOOGLE_API_KEY = googleAPIKey;
 
 var builder = WebApplication.CreateBuilder(args);
 
