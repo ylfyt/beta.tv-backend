@@ -150,7 +150,7 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
         {
             try
             {
-                var selectedVideo = await _context.Videos.Where(v => v.Id == id).ToListAsync();
+                var selectedVideo = await _context.Videos.Where(v => v.Id == id).Include(v=>v.Categories).ToListAsync();
                 if (selectedVideo.Count != 1)
                 {
                     return NotFound(_responseGetterSingle.Error("Video not found"));
@@ -191,8 +191,11 @@ namespace if3250_2022_01_buletin_backend.src.Controllers
                     video = selectedVideo[0]
                 }));
             }
-            catch (System.Exception)
+            catch (System.Exception e)
             {
+                Console.WriteLine("********* Error Update Video *********");
+                Console.WriteLine(e.Message);
+                Console.WriteLine("**************************************");
                 return BadRequest(_responseGetterSingle.Error("Failed to edit video"));
             }
         }
